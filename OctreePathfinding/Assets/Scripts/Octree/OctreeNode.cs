@@ -35,12 +35,50 @@ namespace Octrees
             }
         }
 
+        public void Divide(GameObject obj) => Divide(new OctreeObject(obj));
+
+        void Divide(OctreeObject octreeObject)
+        {
+            if(bounds.size.x <= minNodeSize)
+            {
+                AddObject(octreeObject);
+                return;
+            }
+
+            children ??= new OctreeNode[8];
+
+            bool intersectChild = false;
+
+            for(int i = 0; i < 8; i++)
+            {
+                children[i] ??= new OctreeNode(childBounds[i], minNodeSize);
+
+                if (octreeObject.Intersects(childBounds[i]))
+                {
+                    children[i].Divide(octreeObject);
+                    intersectChild = true;
+                }
+            }
+
+            if (!intersectChild)
+            {
+                AddObject(octreeObject);
+            }
+        }
+
+        public void AddObject(OctreeObject octreeObject) => objects.Add(octreeObject);
+
         public void DrawNode()
         {
             Gizmos.color = Color.cyan;
-            foreach(var childBound in childBounds)
+            Gizmos.DrawWireCube(bounds.center, bounds.size);
+
+            if(children != null)
             {
-                Gizmos.DrawWireCube(childBound.center, childBound.size * 0.95f);
+                foreach(OctreeNode child in children)
+                {
+                    if (child != null) child.DrawNode();
+                }
             }
         }
     }

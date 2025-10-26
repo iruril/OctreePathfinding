@@ -10,7 +10,17 @@ namespace Octrees
         public Octree(GameObject[] worldObjects, float minNodeSize)
         {
             CalculateBounds(worldObjects);
+            CreateTree(worldObjects, minNodeSize);
+        }
+
+        void CreateTree(GameObject[] worldObjects, float minNodeSize)
+        {
             root = new OctreeNode(bounds, minNodeSize);
+
+            foreach(var obj in worldObjects)
+            {
+                root.Divide(obj);
+            }
         }
 
         void CalculateBounds(GameObject[] worldObjects)
