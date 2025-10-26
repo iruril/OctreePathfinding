@@ -8,7 +8,9 @@ namespace Octrees
         public float minNodeSize = 1f;
         Octree ot;
 
-        private void Awake() => ot = new Octree(objects, minNodeSize);
+        public readonly Graph waypoints = new();
+
+        private void Awake() => ot = new Octree(objects, minNodeSize, waypoints);
 
         private void OnDrawGizmos()
         {
@@ -18,6 +20,7 @@ namespace Octrees
             Gizmos.DrawWireCube(ot.bounds.center, ot.bounds.size);
 
             ot.root.DrawNode();
+            ot.graph.DrawGraph();
         }
     }
 }
