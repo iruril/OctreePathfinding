@@ -4,13 +4,17 @@ namespace Octrees
 {
     public class OctreeBaker : MonoBehaviour
     {
-        public GameObject[] objects;
+        GameObject[] objects;
         public float minNodeSize = 1f;
         Octree ot;
 
         public readonly Graph waypoints = new();
 
-        private void Awake() => ot = new Octree(objects, minNodeSize, waypoints);
+        private void Awake()
+        {
+            objects = GameObject.FindGameObjectsWithTag("Level");
+            ot = new Octree(objects, minNodeSize, waypoints);
+        }
 
         private void OnDrawGizmos()
         {

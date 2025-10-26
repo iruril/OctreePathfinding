@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,6 +20,22 @@ namespace Octrees
             CreateTree(worldObjects, minNodeSize);
 
             GetEmptyLeaves(root);
+            GetEdges();
+        }
+
+        private void GetEdges()
+        {
+            foreach (OctreeNode leaf in emptyLeaves)
+            {
+                foreach(OctreeNode otherLeaf in emptyLeaves)
+                {
+                    if (leaf.Equals(otherLeaf)) continue;
+                    if (leaf.bounds.Intersects(otherLeaf.bounds))
+                    {
+                        graph.AddEdge(leaf, otherLeaf);
+                    }
+                }
+            }
         }
 
         void GetEmptyLeaves(OctreeNode node)
@@ -41,6 +58,7 @@ namespace Octrees
             {
                 for (int j = i + 1; j < node.children.Length; j++)
                 {
+                    if(i == j) continue;
                     graph.AddEdge(node.children[i], node.children[j]);
                 }
             }
@@ -63,7 +81,7 @@ namespace Octrees
                 bounds.Encapsulate(obj.GetComponent<Collider>().bounds);
             }
 
-            Vector3 size = Vector3.one * Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 0.5f;
+            Vector3 size = Vector3.one * Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 0.6f;
             bounds.SetMinMax(bounds.center - size, bounds.center + size);
         }
     }
