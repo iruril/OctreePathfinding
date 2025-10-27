@@ -23,7 +23,27 @@ namespace Octrees
             GetEdges();
         }
 
-        private void GetEdges()
+        public OctreeNode FindClosestNode(Vector3 position) => FindClosestNode(root, position);
+
+        public OctreeNode FindClosestNode(OctreeNode node, Vector3 position)
+        {
+            OctreeNode result = null;
+            for(int i = 0; i < node.children.Length; i++)
+            {
+                if (node.children[i].bounds.Contains(position))
+                {
+                    if (node.children[i].IsLeaf)
+                    {
+                        result = node.children[i];
+                        break;
+                    }
+                    result = FindClosestNode(node.children[i], position);
+                }
+            }
+            return result;
+        }
+
+        void GetEdges()
         {
             foreach (OctreeNode leaf in emptyLeaves)
             {
