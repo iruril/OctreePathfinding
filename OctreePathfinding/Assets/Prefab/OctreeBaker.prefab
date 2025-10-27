@@ -44,11 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20df6686ac71b284696a18d115382d4a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  objects:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  minNodeSize: 1
+  minNodeSize: 5
+  drawNodeGizmos: 0
+  drawPathGizmos: 0

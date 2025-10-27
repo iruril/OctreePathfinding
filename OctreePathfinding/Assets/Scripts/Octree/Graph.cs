@@ -100,7 +100,7 @@ namespace Octrees
             {
                 if(++iterationCount > maxIterations)
                 {
-                    Debug.LogError("A* exceeded maximun interations!!!");
+                    //Debug.LogError("A* exceeded maximun interations!!!");
                     return false;
                 }
 
@@ -123,16 +123,17 @@ namespace Octrees
 
                     float tentative_gScore = current.g + Heuristic(current, neighbor);
 
-                    if(tentative_gScore < neighbor.g + Heuristic(current, neighbor))
+                    if(tentative_gScore < neighbor.g || !openSet.Contains(neighbor))
                     {
                         neighbor.g = tentative_gScore;
                         neighbor.h = Heuristic(neighbor, end);
                         neighbor.f = neighbor.g + neighbor.h;
                         neighbor.from = current;
+                        openSet.Add(neighbor);
                     }
                 }
             }
-            Debug.Log("No Path!!");
+            //Debug.Log("No Path!!");
             return false;
         }
 

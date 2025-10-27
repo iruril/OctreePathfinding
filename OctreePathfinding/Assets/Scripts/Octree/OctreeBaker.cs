@@ -9,6 +9,8 @@ namespace Octrees
         public Octree ot;
 
         public readonly Graph waypoints = new();
+        [SerializeField] private bool drawNodeGizmos = false;
+        [SerializeField] private bool drawPathGizmos = false;
 
         private void Awake()
         {
@@ -20,11 +22,11 @@ namespace Octrees
         {
             if (!Application.isPlaying) return;
 
-            Gizmos.color = Color.cyan;
+            Gizmos.color = Color.white;
             Gizmos.DrawWireCube(ot.bounds.center, ot.bounds.size);
 
-            ot.root.DrawNode();
-            ot.graph.DrawGraph();
+            if(drawNodeGizmos) ot.root.DrawNode();
+            if(drawPathGizmos) ot.graph.DrawGraph();
         }
     }
 }
