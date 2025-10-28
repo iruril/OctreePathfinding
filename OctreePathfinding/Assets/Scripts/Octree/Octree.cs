@@ -12,19 +12,58 @@ namespace Octrees
     {
         //Busrt Compile 구조체
         [BurstCompile]
-        struct BoundsIntersectJob : IJobParallelFor
+        struct SpatialHashMapJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<int3> cellCoords;
+            public NativeParallelMultiHashMap<int, int>.ParallelWriter mapWriter;
+
+            public void Execute(int index)
+            {
+                int key = (int)math.hash(cellCoords[index]);
+                mapWriter.Add(key, index);
+            }
+        }
+
+        [BurstCompile]
+        struct SpatialHashMapCheckJob : IJobParallelFor
         {
             [ReadOnly] public NativeArray<Bounds> bounds;
+            [ReadOnly] public NativeArray<int3> cellCoords;
+            [ReadOnly] public NativeParallelMultiHashMap<int, int> cellMap;
             public NativeList<int2>.ParallelWriter resultPairs;
 
             public void Execute(int i)
             {
-                Bounds a = bounds[i];
-                for (int j = i + 1; j < bounds.Length; j++)
+                Bounds bound = bounds[i];
+                int3 baseCell = cellCoords[i];
+
+                for (int dx = -1; dx <= 1; dx++)
                 {
-                    if (a.Intersects(bounds[j]))
+                    for (int dy = -1; dy <= 1; dy++)
                     {
-                        resultPairs.AddNoResize(new int2(i, j));
+                        for (int dz = -1; dz <= 1; dz++)
+                        {
+                            int3 neighbor = baseCell + new int3(dx, dy, dz);
+                            int key = (int)math.hash(neighbor);
+
+                            int iter;
+                            if (cellMap.TryGetFirstValue(key, out iter, out var iterator))
+                            {
+                                int j = iter;
+                                while (true)
+                                {
+                                    if (j > i)
+                                    {
+                                        if (bound.Intersects(bounds[j]))
+                                        {
+                                            resultPairs.AddNoResize(new int2(i, j));
+                                        }
+                                    }
+
+                                    if (!cellMap.TryGetNextValue(out j, ref iterator)) break;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -40,16 +79,15 @@ namespace Octrees
         {
             this.graph = graph;
             Debug.LogFormat("[{0:F3}s] [Octree] Bound Calc Start", Time.realtimeSinceStartup);
-            CalculateBounds(worldObjects); 
+            CalculateBounds(worldObjects);
             Debug.LogFormat("[{0:F3}s] [Octree] Bound Calc End", Time.realtimeSinceStartup);
             CreateTree(worldObjects, minNodeSize);
             Debug.LogFormat("[{0:F3}s] [Octree] Tree Created", Time.realtimeSinceStartup);
 
-            //GetEmptyLeaves(root); 
             GetEmptyLeaves();
             Debug.LogFormat("[{0:F3}s] [Octree] Creating Graph with Empty Leaf Node", Time.realtimeSinceStartup);
-            //BuildEdges();
-            BuildEdgesWithJobs();
+            
+            BuildEdges(minNodeSize);
             Debug.LogFormat("[{0:F3}s] [Octree] Graph Created", Time.realtimeSinceStartup);
         }
 
@@ -58,7 +96,7 @@ namespace Octrees
         public OctreeNode FindClosestNode(OctreeNode node, Vector3 position)
         {
             OctreeNode result = null;
-            for(int i = 0; i < node.children.Length; i++)
+            for (int i = 0; i < node.children.Length; i++)
             {
                 if (node.children[i].bounds.Contains(position))
                 {
@@ -71,50 +109,6 @@ namespace Octrees
                 }
             }
             return result;
-        }
-
-        [Obsolete("시간복잡도가 O(n^2)라서 노드가 1000개만 되어도 백만번 순회함. 사용하지 말 것." +
-            "BuildEdgesWithJobs()를 대신 사용 요망.")]
-        void BuildEdges()
-        {
-            foreach (OctreeNode leaf in emptyLeaves)
-            {
-                foreach(OctreeNode otherLeaf in emptyLeaves)
-                {
-                    if (leaf.Equals(otherLeaf)) continue;
-                    if (leaf.bounds.Intersects(otherLeaf.bounds))
-                    {
-                        graph.AddEdge(leaf, otherLeaf);
-                    }
-                }
-            }
-        }
-
-        [Obsolete("재귀호출 방식으로 구성되어 있음. 가급적 사용하지 말 것. GetEmptyLeaves()를 대신 사용 요망.")]
-        void GetEmptyLeaves(OctreeNode node)
-        {
-            if (node.IsLeaf && node.objects.Count == 0)
-            {
-                emptyLeaves.Add(node);
-                graph.AddNode(node);
-                return;
-            }
-
-            if (node.children == null) return;
-
-            foreach (OctreeNode child in node.children)
-            {
-                GetEmptyLeaves(child);
-            }
-
-            for (int i = 0; i < node.children.Length; i++)
-            {
-                for (int j = i + 1; j < node.children.Length; j++)
-                {
-                    if (i == j) continue;
-                    graph.AddEdge(node.children[i], node.children[j]);
-                }
-            }
         }
 
         void GetEmptyLeaves()
@@ -170,53 +164,70 @@ namespace Octrees
             edgeBuffer.Clear();
         }
 
-        void BuildEdgesWithJobs()
+        void BuildEdges(float minNodeSize)
         {
             int count = emptyLeaves.Count;
             if (count == 0) return;
 
-            // NativeArray로 변환
             NativeArray<Bounds> boundsArray = new NativeArray<Bounds>(count, Allocator.TempJob);
             for (int i = 0; i < count; i++)
             {
                 boundsArray[i] = emptyLeaves[i].bounds;
             }
 
-            // NativeList 초기화 (충분한 capacity 확보)
+            NativeArray<int3> cellCoords = new NativeArray<int3>(count, Allocator.TempJob);
+            for (int i = 0; i < count; i++)
+            {
+                float3 center = boundsArray[i].center;
+                int3 ci = new int3(
+                    (int)math.floor(center.x / minNodeSize),
+                    (int)math.floor(center.y / minNodeSize),
+                    (int)math.floor(center.z / minNodeSize)
+                );
+                cellCoords[i] = ci;
+            }
+
+            var map = new NativeParallelMultiHashMap<int, int>((int)(count * 1.5f), Allocator.TempJob); //넉넉하게 1.5배 정도
+
+            var insertJob = new SpatialHashMapJob
+            {
+                cellCoords = cellCoords,
+                mapWriter = map.AsParallelWriter()
+            };
+            JobHandle insertHandle = insertJob.Schedule(count, 64);
+            insertHandle.Complete();
+
             NativeList<int2> intersectPairs = new NativeList<int2>(count * 8, Allocator.TempJob);
 
-            try
+            // 각 i에 대해 27개 이웃 셀을 조회하여 교차 검사
+            var checkJob = new SpatialHashMapCheckJob
             {
-                // Job 생성
-                var job = new BoundsIntersectJob
-                {
-                    bounds = boundsArray,
-                    resultPairs = intersectPairs.AsParallelWriter()
-                };
+                bounds = boundsArray,
+                cellCoords = cellCoords,
+                cellMap = map,
+                resultPairs = intersectPairs.AsParallelWriter()
+            };
 
-                // Job 실행
-                JobHandle handle = job.Schedule(count, 64);
-                handle.Complete();
+            JobHandle checkHandle = checkJob.Schedule(count, 64);
+            checkHandle.Complete();
 
-                for (int i = 0; i < intersectPairs.Length; i++)
-                {
-                    int2 p = intersectPairs[i];
-                    graph.AddEdge(emptyLeaves[p.x], emptyLeaves[p.y]);
-                }
-            }
-            finally
+            for (int i = 0; i < intersectPairs.Length; i++)
             {
-                // 메모리 해제
-                if (boundsArray.IsCreated) boundsArray.Dispose();
-                if (intersectPairs.IsCreated) intersectPairs.Dispose();
+                int2 pair = intersectPairs[i];
+                graph.AddEdge(emptyLeaves[pair.x], emptyLeaves[pair.y]);
             }
+
+            boundsArray.Dispose();
+            cellCoords.Dispose();
+            if (map.IsCreated) map.Dispose();
+            intersectPairs.Dispose();
         }
 
         void CreateTree(GameObject[] worldObjects, float minNodeSize)
         {
             root = new OctreeNode(bounds, minNodeSize);
 
-            foreach(var obj in worldObjects)
+            foreach (var obj in worldObjects)
             {
                 root.Divide(obj);
             }
@@ -232,5 +243,51 @@ namespace Octrees
             Vector3 size = Vector3.one * Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 0.6f;
             bounds.SetMinMax(bounds.center - size, bounds.center + size);
         }
+
+        #region  Obsoleted Logics
+        [Obsolete("시간복잡도가 O(n^2)라서 노드가 1000개만 되어도 백만번 순회함. 사용하지 말 것." +
+            "BuildEdgesWithJobs()를 대신 사용 요망.")]
+        void BuildEdges()
+        {
+            foreach (OctreeNode leaf in emptyLeaves)
+            {
+                foreach (OctreeNode otherLeaf in emptyLeaves)
+                {
+                    if (leaf.Equals(otherLeaf)) continue;
+                    if (leaf.bounds.Intersects(otherLeaf.bounds))
+                    {
+                        graph.AddEdge(leaf, otherLeaf);
+                    }
+                }
+            }
+        }
+
+        [Obsolete("재귀호출 방식으로 구성되어 있음. 가급적 사용하지 말 것. GetEmptyLeaves()를 대신 사용 요망.")]
+        void GetEmptyLeaves(OctreeNode node)
+        {
+            if (node.IsLeaf && node.objects.Count == 0)
+            {
+                emptyLeaves.Add(node);
+                graph.AddNode(node);
+                return;
+            }
+
+            if (node.children == null) return;
+
+            foreach (OctreeNode child in node.children)
+            {
+                GetEmptyLeaves(child);
+            }
+
+            for (int i = 0; i < node.children.Length; i++)
+            {
+                for (int j = i + 1; j < node.children.Length; j++)
+                {
+                    if (i == j) continue;
+                    graph.AddEdge(node.children[i], node.children[j]);
+                }
+            }
+        }
+        #endregion
     }
 }
