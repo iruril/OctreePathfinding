@@ -21300,6 +21300,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: OctreeBaker
       objectReference: {fileID: 0}
+    - target: {fileID: 5534394617221937008, guid: be2964f4ca8b8c942ae33d00125134b5, type: 3}
+      propertyPath: minNodeSize
+      value: 5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
