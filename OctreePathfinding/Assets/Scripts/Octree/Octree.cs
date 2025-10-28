@@ -1,11 +1,35 @@
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using Unity.Collections;
+using Unity.Mathematics;
+using Unity.Jobs;
+using Unity.Burst;
+using System;
 
 namespace Octrees
 {
     public class Octree
     {
+        //Busrt Compile 구조체
+        [BurstCompile]
+        struct BoundsIntersectJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<Bounds> bounds;
+            public NativeList<int2>.ParallelWriter resultPairs;
+
+            public void Execute(int i)
+            {
+                Bounds a = bounds[i];
+                for (int j = i + 1; j < bounds.Length; j++)
+                {
+                    if (a.Intersects(bounds[j]))
+                    {
+                        resultPairs.AddNoResize(new int2(i, j));
+                    }
+                }
+            }
+        }
+
         public OctreeNode root;
         public Bounds bounds;
         public Graph graph;
@@ -15,12 +39,18 @@ namespace Octrees
         public Octree(GameObject[] worldObjects, float minNodeSize, Graph graph)
         {
             this.graph = graph;
-
-            CalculateBounds(worldObjects);
+            Debug.LogFormat("[{0:F3}s] [Octree] Bound Calc Start", Time.realtimeSinceStartup);
+            CalculateBounds(worldObjects); 
+            Debug.LogFormat("[{0:F3}s] [Octree] Bound Calc End", Time.realtimeSinceStartup);
             CreateTree(worldObjects, minNodeSize);
+            Debug.LogFormat("[{0:F3}s] [Octree] Tree Created", Time.realtimeSinceStartup);
 
-            GetEmptyLeaves(root);
-            GetEdges();
+            GetEmptyLeaves(root); 
+            Debug.LogFormat("[{0:F3}s] [Octree] Creating Graph with Empty Leaf Node", Time.realtimeSinceStartup);
+            
+            //BuildEdges();
+            BuildEdgesWithJobs();
+            Debug.LogFormat("[{0:F3}s] [Octree] Graph Created", Time.realtimeSinceStartup);
         }
 
         public OctreeNode FindClosestNode(Vector3 position) => FindClosestNode(root, position);
@@ -43,7 +73,8 @@ namespace Octrees
             return result;
         }
 
-        void GetEdges()
+        [Obsolete("시간복잡도가 O(n^2)라서 노드가 1000개만 되어도 백만번 순회한다. 사용하지 말 것.")]
+        void BuildEdges()
         {
             foreach (OctreeNode leaf in emptyLeaves)
             {
@@ -60,7 +91,7 @@ namespace Octrees
 
         void GetEmptyLeaves(OctreeNode node)
         {
-            if(node.IsLeaf && node.objects.Count == 0)
+            if (node.IsLeaf && node.objects.Count == 0)
             {
                 emptyLeaves.Add(node);
                 graph.AddNode(node);
@@ -78,10 +109,48 @@ namespace Octrees
             {
                 for (int j = i + 1; j < node.children.Length; j++)
                 {
-                    if(i == j) continue;
+                    if (i == j) continue;
                     graph.AddEdge(node.children[i], node.children[j]);
                 }
             }
+        }
+
+        // Job, Burst로 메모리 효율성 극대화
+        void BuildEdgesWithJobs()
+        {
+            int count = emptyLeaves.Count;
+            if (count == 0) return;
+
+            // NativeArray로 변환
+            NativeArray<Bounds> boundsArray = new NativeArray<Bounds>(count, Allocator.TempJob);
+            for (int i = 0; i < count; i++)
+            {
+                boundsArray[i] = emptyLeaves[i].bounds;
+            }
+
+            // 한 리프 노드당 최대 8개 정도의 후보만 교차한다고 가정
+            NativeList<int2> intersectPairs = new NativeList<int2>(count * 8, Allocator.TempJob);
+
+            // Job 생성
+            var job = new BoundsIntersectJob
+            {
+                bounds = boundsArray,
+                resultPairs = intersectPairs.AsParallelWriter()
+            };
+
+            // Job 실행 (Burst 병렬)
+            JobHandle handle = job.Schedule(count, 64);
+            handle.Complete();
+
+            // 결과 반영
+            foreach (var pair in intersectPairs)
+            {
+                graph.AddEdge(emptyLeaves[pair.x], emptyLeaves[pair.y]);
+            }
+
+            // 메모리 해제
+            boundsArray.Dispose();
+            intersectPairs.Dispose();
         }
 
         void CreateTree(GameObject[] worldObjects, float minNodeSize)

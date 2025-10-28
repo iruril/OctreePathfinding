@@ -42,7 +42,7 @@ namespace Octrees
             if (Vector3.Distance(graph.GetPathNode(currentWaypoint).bounds.center, transform.position) < accuracy)
             {
                 currentWaypoint++;
-                Debug.Log($"Waypoint {currentWaypoint} reached");
+                //Debug.Log($"Waypoint {currentWaypoint} reached");
             }
 
             if (currentWaypoint < graph.GetPathLength())
@@ -84,18 +84,18 @@ namespace Octrees
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(graph.GetPathNode(0).bounds.center, 0.7f);
 
-            Gizmos.color = Color.cyan;
+            Gizmos.color = Color.blue;
             Gizmos.DrawWireSphere(graph.GetPathNode(graph.GetPathLength() - 1).bounds.center, 0.7f);
 
             for (int i = 0; i < graph.GetPathLength(); i++)
             {
-                Gizmos.color = Color.magenta;
+                Gizmos.color = Color.green;
                 Gizmos.DrawWireSphere(graph.GetPathNode(i).bounds.center, 0.5f);
                 if (i < graph.GetPathLength() - 1)
                 {
                     Vector3 start = graph.GetPathNode(i).bounds.center;
                     Vector3 end = graph.GetPathNode(i + 1).bounds.center;
-                    Gizmos.color = Color.magenta;
+                    Gizmos.color = Color.green;
                     Gizmos.DrawLine(start, end);
                 }
             }

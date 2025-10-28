@@ -14,6 +14,7 @@ namespace Octrees
 
         private void Awake()
         {
+            Debug.Log("Finding Levels...");
             objects = GameObject.FindGameObjectsWithTag("Level");
             ot = new Octree(objects, minNodeSize, waypoints);
         }

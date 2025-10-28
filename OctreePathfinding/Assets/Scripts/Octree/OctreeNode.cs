@@ -6,8 +6,6 @@ namespace Octrees
     public class OctreeNode
     {
         public List<OctreeObject> objects = new();
-
-        static int nextId;
         public readonly int id;
 
         public Bounds bounds;
