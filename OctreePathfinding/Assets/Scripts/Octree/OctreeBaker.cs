@@ -1,22 +1,41 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Octrees
 {
     public class OctreeBaker : MonoBehaviour
     {
-        GameObject[] objects;
+        public static OctreeBaker Instance = null;
+
+        [SerializeField] Transform _levelParent;
+        public GameObject[] LevelObjects { get; private set; } = new GameObject[0];
         public float minNodeSize = 1f;
         public Octree ot;
 
-        public readonly Graph waypoints = new();
+        public readonly Graph graph = new();
         [SerializeField] private bool drawNodeGizmos = false;
         [SerializeField] private bool drawPathGizmos = false;
 
         private void Awake()
         {
-            Debug.Log("Finding Levels...");
-            objects = GameObject.FindGameObjectsWithTag("Level");
-            ot = new Octree(objects, minNodeSize, waypoints);
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else if (Instance != this)
+            {
+                Debug.LogWarning("OctreeBaker is Duplicated!! Remaining One Instance ...");
+                Destroy(this.gameObject);
+                return;
+            }
+
+            Debug.LogFormat("[{0:F3}s] Finding Levels...", Time.realtimeSinceStartup);
+            LevelObjects = new GameObject[_levelParent.childCount];
+            for (int i = 0; i < _levelParent.childCount; i++)
+            {
+                LevelObjects[i] = _levelParent.GetChild(i).gameObject;
+            }
+            ot = new Octree(LevelObjects, minNodeSize, graph);
         }
 
         private void OnDrawGizmos()

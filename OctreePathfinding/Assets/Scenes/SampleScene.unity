@@ -21444,7 +21444,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -21504,9 +21504,9 @@ PrefabInstance:
       value: OctreeBaker
       objectReference: {fileID: 0}
     - target: {fileID: 5534394617221937008, guid: be2964f4ca8b8c942ae33d00125134b5, type: 3}
-      propertyPath: minNodeSize
-      value: 5
-      objectReference: {fileID: 0}
+      propertyPath: _levelParent
+      value: 
+      objectReference: {fileID: 1388498063}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
