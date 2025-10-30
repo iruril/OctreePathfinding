@@ -1,3 +1,4 @@
+using NUnit;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,79 +7,81 @@ namespace Octrees
 {
     public partial class Graph
     {
-        const int maxIterations = 5000;
-        public bool AStar(OctreeNode startNode, OctreeNode endNode, ref List<Node> path)
+        const int maxIterations = 10000;
+        public bool AStar(Node start, Node end, ref List<Node> path)
         {
             path.Clear();
-            Node start = FindNode(startNode);
-            Node end = FindNode(endNode);
+            var ctx = PathfindingContextPool.Rent(nodes.Count);
+            ctx.BeginNewSearch();
 
-            if (start == null || end == null)
+            try
             {
-                Debug.LogError($"Start or End node not found!!");
-                return false;
-            }
+                var open = new SortedSet<Node>(new NodeComparer(ctx));
 
-            SortedSet<Node> openSet = new(new NodeComparer());
-            HashSet<Node> closedSet = new();
-            int iterationCount = 0;
+                ctx.Activate(start.id);
+                ctx.g[start.id] = 0;
+                ctx.h[start.id] = Heuristic(start, end);
+                ctx.f[start.id] = ctx.h[start.id];
+                open.Add(start);
 
-            start.g = 0;
-            start.h = Heuristic(start, end);
-            start.f = start.g + start.h;
-            start.from = null;
-            openSet.Add(start);
-
-            while (openSet.Count > 0)
-            {
-                if (++iterationCount > maxIterations) return false;
-
-                Node current = openSet.First();
-                openSet.Remove(current);
-
-                if (current.Equals(end))
+                int iterations = 0;
+                while (open.Count > 0)
                 {
-                    ReconstructPath(current, ref path);
-                    return true;
-                }
+                    if (++iterations > maxIterations)
+                        return false;
 
-                closedSet.Add(current);
+                    Node current = open.Min;
+                    open.Remove(current);
 
-                foreach (Edge edge in current.edges)
-                {
-                    Node neighbor = Equals(edge.x, current) ? edge.y : edge.x;
-
-                    if (closedSet.Contains(neighbor)) continue;
-
-                    float tentative_gScore = current.g + Heuristic(current, neighbor);
-
-                    if (tentative_gScore < neighbor.g || !openSet.Contains(neighbor))
+                    if (current == end)
                     {
-                        neighbor.g = tentative_gScore;
-                        neighbor.h = Heuristic(neighbor, end);
-                        neighbor.f = neighbor.g + neighbor.h;
-                        neighbor.from = current;
-                        openSet.Add(neighbor);
+                        ReconstructPath(current, ref path, ctx.from);
+                        return true;
+                    }
+
+                    ctx.closed[current.id] = true;
+
+                    foreach (var edge in current.edges)
+                    {
+                        Node neighbor = edge.x == current ? edge.y : edge.x;
+                        if (ctx.closed[neighbor.id]) continue;
+
+                        if (!ctx.IsActive(neighbor.id))
+                            ctx.Activate(neighbor.id);
+
+                        float tentativeG = ctx.g[current.id] + Heuristic(current, neighbor);
+                        if (tentativeG < ctx.g[neighbor.id])
+                        {
+                            ctx.from[neighbor.id] = current;
+                            ctx.g[neighbor.id] = tentativeG;
+                            ctx.h[neighbor.id] = Heuristic(neighbor, end);
+                            ctx.f[neighbor.id] = ctx.g[neighbor.id] + ctx.h[neighbor.id];
+                            open.Add(neighbor);
+                        }
                     }
                 }
+
+                return false;
             }
-            return false;
+            finally
+            {
+                PathfindingContextPool.Return(ctx);
+            }
         }
 
-        void ReconstructPath(Node node, ref List<Node> path)
+        void ReconstructPath(Node node, ref List<Node> path, Node[] from)
         {
             while (node != null)
             {
                 path.Add(node);
-                node = node.from;
+                node = from[node.id];
             }
-
             path.Reverse();
         }
 
         float Heuristic(Node a, Node b) => (a.octreeNode.bounds.center - b.octreeNode.bounds.center).sqrMagnitude;
 
-        Node FindNode(OctreeNode octreeNode)
+        public Node FindNode(OctreeNode octreeNode)
         {
             nodes.TryGetValue(octreeNode, out Node node);
             return node;
@@ -86,15 +89,19 @@ namespace Octrees
 
         public class NodeComparer : IComparer<Node>
         {
+            private readonly PathfindingContext ctx; 
+            public NodeComparer(PathfindingContext ctx)
+            {
+                this.ctx = ctx;
+            }
+
             public int Compare(Node x, Node y)
             {
                 if (x == null || y == null) return 0;
 
-                int result = x.f.CompareTo(y.f);
+                int result = ctx.f[x.id].CompareTo(ctx.f[y.id]);
                 if (result == 0)
-                {
                     return x.id.CompareTo(y.id);
-                }
                 return result;
             }
         }

@@ -86,6 +86,12 @@ namespace Octrees
             currentWaypoint = 0;
         }
 
+        public void OnPathFailed()
+        {
+            Debug.LogWarning($"[{name}] Pathfinding failed ? retrying...");
+            Invoke(nameof(GetRandomDestination), 1.0f);
+        }
+
         void OnDrawGizmos()
         {
             if (!Application.isPlaying || OctreeBaker.Instance.graph == null || GetPathLength() == 0) return;

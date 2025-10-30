@@ -52,7 +52,16 @@ namespace Octrees
                 Task task = Task.Run(() =>
                 {
                     List<Node> path = new();
-                    bool success = graph.AStar(req.startNode, req.endNode, ref path);
+                    Node start = graph.FindNode(req.startNode);
+                    Node end = graph.FindNode(req.endNode); 
+                    
+                    if (start == null || end == null)
+                    {
+                        req.agent.OnPathFailed();
+                        return;
+                    }
+
+                    bool success = graph.AStar(start, end, ref path);
                     if (success)
                         completedPaths.Enqueue((req.agent, path));
                 });
