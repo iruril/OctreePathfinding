@@ -76,10 +76,13 @@ namespace Octrees
         void GetRandomDestination()
         {
             OctreeNode destinationNode;
-            do
-            {
-                destinationNode = OctreeBaker.Instance.graph.nodes.ElementAt(Random.Range(0, OctreeBaker.Instance.graph.nodes.Count)).Key;
-            } while (!OctreeBaker.Instance.graph.AStar(currentNode, destinationNode, ref path));
+            destinationNode = OctreeBaker.Instance.graph.nodes.ElementAt(Random.Range(0, OctreeBaker.Instance.graph.nodes.Count)).Key;
+            OctreeBaker.Instance.RequestPath(currentNode, destinationNode, this);
+        }
+
+        public void OnPathReady(List<Node> newPath)
+        {
+            path = newPath;
             currentWaypoint = 0;
         }
 
