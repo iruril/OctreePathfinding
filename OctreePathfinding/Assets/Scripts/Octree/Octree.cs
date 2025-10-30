@@ -1,69 +1,46 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Unity.Collections;
-using Unity.Mathematics;
-using Unity.Jobs;
-using Unity.Burst;
 using System;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
+using Unity.Mathematics;
+using System.Runtime.CompilerServices;
 
 namespace Octrees
 {
     public class Octree
     {
-        //Busrt Compile 구조체
         [BurstCompile]
-        struct SpatialHashMapJob : IJobParallelFor
+        public struct AABB
         {
-            [ReadOnly] public NativeArray<int3> cellCoords;
-            public NativeParallelMultiHashMap<int, int>.ParallelWriter mapWriter;
+            public Vector3 center;
+            public Vector3 extents;
 
-            public void Execute(int index)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool Intersects(in AABB other)
             {
-                int key = (int)math.hash(cellCoords[index]);
-                mapWriter.Add(key, index);
+                return Mathf.Abs(center.x - other.center.x) <= (extents.x + other.extents.x) &&
+                       Mathf.Abs(center.y - other.center.y) <= (extents.y + other.extents.y) &&
+                       Mathf.Abs(center.z - other.center.z) <= (extents.z + other.extents.z);
             }
         }
 
         [BurstCompile]
-        struct SpatialHashMapCheckJob : IJobParallelFor
+        public struct BuildEdgesJob : IJobParallelFor
         {
-            [ReadOnly] public NativeArray<Bounds> bounds;
-            [ReadOnly] public NativeArray<int3> cellCoords;
-            [ReadOnly] public NativeParallelMultiHashMap<int, int> cellMap;
-            public NativeList<int2>.ParallelWriter resultPairs;
+            [ReadOnly] public NativeArray<AABB> boundsArray;
+            public NativeList<int2>.ParallelWriter edgeWriter;
 
-            public void Execute(int i)
+            public void Execute(int index)
             {
-                Bounds bound = bounds[i];
-                int3 baseCell = cellCoords[i];
-
-                for (int dx = -1; dx <= 1; dx++)
+                var a = boundsArray[index];
+                for (int j = index + 1; j < boundsArray.Length; j++)
                 {
-                    for (int dy = -1; dy <= 1; dy++)
+                    var b = boundsArray[j];
+                    if (a.Intersects(b))
                     {
-                        for (int dz = -1; dz <= 1; dz++)
-                        {
-                            int3 neighbor = baseCell + new int3(dx, dy, dz);
-                            int key = (int)math.hash(neighbor);
-
-                            int iter;
-                            if (cellMap.TryGetFirstValue(key, out iter, out var iterator))
-                            {
-                                int j = iter;
-                                while (true)
-                                {
-                                    if (j > i)
-                                    {
-                                        if (bound.Intersects(bounds[j]))
-                                        {
-                                            resultPairs.AddNoResize(new int2(i, j));
-                                        }
-                                    }
-
-                                    if (!cellMap.TryGetNextValue(out j, ref iterator)) break;
-                                }
-                            }
-                        }
+                        edgeWriter.AddNoResize(new int2(index, j));
                     }
                 }
             }
@@ -87,8 +64,10 @@ namespace Octrees
             GetEmptyLeaves();
             Debug.LogFormat("[{0:F3}s] [Octree] Creating Graph with Empty Leaf Node", Time.realtimeSinceStartup);
             
-            BuildEdges(minNodeSize);
+            BuildEdgesWithJob();
             Debug.LogFormat("[{0:F3}s] [Octree] Graph Created", Time.realtimeSinceStartup);
+            Debug.Log($"[Octree] {graph.nodes.Count} nodes created.");
+            Debug.Log($"[Octree] {graph.edges.Count} edges created.");
         }
 
         public OctreeNode FindClosestNode(Vector3 position) => FindClosestNode(root, position);
@@ -164,63 +143,42 @@ namespace Octrees
             edgeBuffer.Clear();
         }
 
-        void BuildEdges(float minNodeSize)
+
+        void BuildEdgesWithJob()
         {
             int count = emptyLeaves.Count;
             if (count == 0) return;
 
-            NativeArray<Bounds> boundsArray = new NativeArray<Bounds>(count, Allocator.TempJob);
+            var boundsArray = new NativeArray<AABB>(count, Allocator.TempJob);
             for (int i = 0; i < count; i++)
             {
-                boundsArray[i] = emptyLeaves[i].bounds;
+                var b = emptyLeaves[i].bounds;
+                boundsArray[i] = new AABB
+                {
+                    center = b.center,
+                    extents = b.extents
+                };
             }
 
-            NativeArray<int3> cellCoords = new NativeArray<int3>(count, Allocator.TempJob);
-            for (int i = 0; i < count; i++)
+            var edgeList = new NativeList<int2>(count * 8, Allocator.TempJob);
+
+            var job = new BuildEdgesJob
             {
-                float3 center = boundsArray[i].center;
-                int3 ci = new int3(
-                    (int)math.floor(center.x / minNodeSize),
-                    (int)math.floor(center.y / minNodeSize),
-                    (int)math.floor(center.z / minNodeSize)
-                );
-                cellCoords[i] = ci;
-            }
-
-            var map = new NativeParallelMultiHashMap<int, int>((int)(count * 1.5f), Allocator.TempJob); //넉넉하게 1.5배 정도
-
-            var insertJob = new SpatialHashMapJob
-            {
-                cellCoords = cellCoords,
-                mapWriter = map.AsParallelWriter()
-            };
-            JobHandle insertHandle = insertJob.Schedule(count, 64);
-            insertHandle.Complete();
-
-            NativeList<int2> intersectPairs = new NativeList<int2>(count * 8, Allocator.TempJob);
-
-            // 각 i에 대해 27개 이웃 셀을 조회하여 교차 검사
-            var checkJob = new SpatialHashMapCheckJob
-            {
-                bounds = boundsArray,
-                cellCoords = cellCoords,
-                cellMap = map,
-                resultPairs = intersectPairs.AsParallelWriter()
+                boundsArray = boundsArray,
+                edgeWriter = edgeList.AsParallelWriter()
             };
 
-            JobHandle checkHandle = checkJob.Schedule(count, 64);
-            checkHandle.Complete();
+            var handle = job.Schedule(count, 32);
+            handle.Complete();
 
-            for (int i = 0; i < intersectPairs.Length; i++)
+            for (int i = 0; i < edgeList.Length; i++)
             {
-                int2 pair = intersectPairs[i];
-                graph.AddEdge(emptyLeaves[pair.x], emptyLeaves[pair.y]);
+                var e = edgeList[i];
+                graph.AddEdge(emptyLeaves[e.x], emptyLeaves[e.y]);
             }
 
             boundsArray.Dispose();
-            cellCoords.Dispose();
-            if (map.IsCreated) map.Dispose();
-            intersectPairs.Dispose();
+            edgeList.Dispose();
         }
 
         void CreateTree(GameObject[] worldObjects, float minNodeSize)
@@ -245,8 +203,114 @@ namespace Octrees
         }
 
         #region  Obsoleted Logics
+        [Obsolete("Octree 구조 상 이미 공간 분할이 잘 되어있어 의미가 없음.")]
+        [BurstCompile]
+        struct BuildEdgesSpatialHashJob : IJobParallelFor
+        {
+            [ReadOnly] public NativeArray<AABB> boundsArray;
+            [ReadOnly] public NativeParallelMultiHashMap<ulong, int> spatialMap;
+            [ReadOnly] public float cellSize;
+            public NativeList<int2>.ParallelWriter edges;
+
+            public void Execute(int index)
+            {
+                var aabb = boundsArray[index];
+                int3 cell = (int3)math.floor(aabb.center / cellSize);
+
+                for (int dx = -1; dx <= 1; dx++)
+                    for (int dy = -1; dy <= 1; dy++)
+                        for (int dz = -1; dz <= 1; dz++)
+                        {
+                            int3 neighbor = cell + new int3(dx, dy, dz);
+                            ulong hash = HashCell(neighbor);
+
+                            if (!spatialMap.TryGetFirstValue(hash, out int otherIndex, out var it))
+                                continue;
+
+                            do
+                            {
+                                if (otherIndex <= index) continue;
+
+                                var other = boundsArray[otherIndex];
+                                if (aabb.Intersects(other))
+                                {
+                                    edges.AddNoResize(new int2(index, otherIndex));
+                                }
+                            }
+                            while (spatialMap.TryGetNextValue(out otherIndex, ref it));
+                        }
+            }
+
+            static ulong HashCell(int3 cell)
+            {
+                unchecked
+                {
+                    return (ulong)(
+                        (cell.x * 73856093) ^
+                        (cell.y * 19349663) ^
+                        (cell.z * 83492791)
+                    );
+                }
+            }
+        }
+
+        [Obsolete("Octree 구조 상 이미 공간 분할이 잘 되어있어 의미가 없음. BuildEdgesWithJob()을 사용할 것.")]
+        public void BuildEdgesWithSpatialHashJobs()
+        {
+            int count = emptyLeaves.Count;
+            if (count == 0) return;
+
+            var boundsArray = new NativeArray<AABB>(count, Allocator.TempJob);
+            for (int i = 0; i < count; i++)
+            {
+                var b = emptyLeaves[i].bounds;
+                boundsArray[i] = new AABB
+                {
+                    center = b.center,
+                    extents = b.extents
+                };
+            }
+
+            float cellSize = Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) / 4f;
+
+            var spatialMap = new NativeParallelMultiHashMap<ulong, int>(count, Allocator.TempJob);
+            for (int i = 0; i < count; i++)
+            {
+                int3 cell = (int3)math.floor(boundsArray[i].center / cellSize);
+                ulong hash = (ulong)(
+                    (cell.x * 73856093) ^
+                    (cell.y * 19349663) ^
+                    (cell.z * 83492791)
+                );
+                spatialMap.Add(hash, i);
+            }
+
+            var edgeList = new NativeList<int2>(count * 8, Allocator.TempJob);
+
+            var job = new BuildEdgesSpatialHashJob
+            {
+                boundsArray = boundsArray,
+                spatialMap = spatialMap,
+                cellSize = cellSize,
+                edges = edgeList.AsParallelWriter()
+            };
+
+            var handle = job.Schedule(count, 64);
+            handle.Complete();
+
+            for (int i = 0; i < edgeList.Length; i++)
+            {
+                var e = edgeList[i];
+                graph.AddEdge(emptyLeaves[e.x], emptyLeaves[e.y]);
+            }
+
+            boundsArray.Dispose();
+            spatialMap.Dispose();
+            edgeList.Dispose();
+        }
+
         [Obsolete("시간복잡도가 O(n^2)라서 노드가 1000개만 되어도 백만번 순회함. 사용하지 말 것." +
-            "BuildEdgesWithJobs()를 대신 사용 요망.")]
+            "BuildEdgesWithJob()을 대신 사용 요망.")]
         void BuildEdges()
         {
             foreach (OctreeNode leaf in emptyLeaves)
