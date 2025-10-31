@@ -7,7 +7,6 @@ namespace Octrees
     {
         private readonly Stack<PathfindingContext> _pool = new();
         private readonly object _lock = new();
-        private const int MaxContexts = 20;
         private int nodeCount = 0;
 
         public void Init(int nodeCount, int initCount)
@@ -39,8 +38,7 @@ namespace Octrees
         {
             lock (_lock)
             {
-                if (_pool.Count < MaxContexts)
-                    _pool.Push(ctx);
+                _pool.Push(ctx);
             }
         }
     }

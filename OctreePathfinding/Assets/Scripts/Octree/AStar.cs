@@ -5,10 +5,9 @@ namespace Octrees
 {
     public partial class Graph
     {
-        const int maxIterations = 10000;
+        const int maxIterations = 20000;
         public bool AStar(Node start, Node end, ref List<Node> path, PathfindingContext ctx)
         {
-            Debug.Log($"[A Star] Start");
             path.Clear();
             ctx.BeginNewSearch();
 
@@ -20,12 +19,16 @@ namespace Octrees
             ctx.f[start.id] = ctx.h[start.id];
             open.Add(start);
 
-            int iterations = 0;
+            int iterations = 0; 
+            Node bestSoFar = start;
+            float bestDistance = ctx.h[start.id];
+
             while (open.Count > 0)
             {
                 if (++iterations > maxIterations)
                 {
-                    Debug.Log($"[A Star] Fail - exceed clamp");
+                    //Debug.Log($"[A Star] Fail - exceed clamp");
+                    ReconstructPath(bestSoFar, ref path, ctx.from);
                     return false;
                 }
 
@@ -38,15 +41,23 @@ namespace Octrees
                     return true;
                 }
 
-                ctx.closed[current.id] = true;
+                ctx.closed[current.id] = true; 
+
+                float distToEnd = Heuristic(current, end);
+                if (distToEnd < bestDistance)
+                {
+                    bestDistance = distToEnd;
+                    bestSoFar = current;
+                }
 
                 foreach (var edge in current.edges)
                 {
                     Node neighbor = edge.x == current ? edge.y : edge.x;
-                    if (ctx.closed[neighbor.id]) continue;
 
                     if (!ctx.IsActive(neighbor.id))
                         ctx.Activate(neighbor.id);
+
+                    if (ctx.closed[neighbor.id]) continue;
 
                     float tentativeG = ctx.g[current.id] + Heuristic(current, neighbor);
                     if (tentativeG < ctx.g[neighbor.id])
@@ -60,6 +71,8 @@ namespace Octrees
                 }
             }
 
+            Debug.Log($"[A Star] Fail - no path : {end.octreeNode.bounds.center}");
+            ReconstructPath(bestSoFar, ref path, ctx.from);
             return false;
         }
 

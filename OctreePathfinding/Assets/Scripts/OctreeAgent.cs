@@ -20,6 +20,8 @@ namespace Octrees
         public int GetPathLength() => path.Count; 
         bool isRequestingPath = false;
 
+        public bool IsCompletePath { get; private set; } = false;
+
         public OctreeNode GetPathNode(int index)
         {
             if (path == null) return null;
@@ -85,17 +87,17 @@ namespace Octrees
             OctreeBaker.Instance.RequestPath(currentNode, destinationNode, this);
         }
 
-        public void OnPathReady(List<Node> newPath)
+        public void OnPathReady(List<Node> newPath, bool result)
         {
             path = newPath;
+            IsCompletePath = result;
             currentWaypoint = 0;
             isRequestingPath = false;
         }
 
-        public void OnPathFailed()
+        public void OnPathInvaid()
         {
-            isRequestingPath = false;
-            Debug.LogWarning($"[{name}] Pathfinding failed ? retrying...");
+            isRequestingPath = false; 
             RequestRandomPath();
         }
 

@@ -19,8 +19,7 @@ namespace Octrees
         [SerializeField] private bool drawPathGizmos = false;
 
         //멀티스레드 환경에서 동시다발적인 Enqueue(), Dequeue()에 대응하기 위함 
-        private readonly ConcurrentQueue<(OctreeAgent agent, List<Node> path)> succeedAgents = new(); 
-        private readonly ConcurrentQueue<OctreeAgent> failedAgents = new();
+        private readonly ConcurrentQueue<(OctreeAgent agent, List<Node> path, bool result)> completeAgents = new();
         private readonly Queue<PathRequest> pendingRequests = new();
         private readonly List<Task> runningTasks = new();
 
@@ -43,6 +42,21 @@ namespace Octrees
             ot = new Octree(LevelObjects, minNodeSize, graph);
             pool.Init(ot.graph.nodes.Count, MaxConcurrentTasks);
         }
+        private void OnGUI()
+        {
+            GUIStyle style = new GUIStyle(GUI.skin.label);
+            style.fontSize = 16;
+            style.normal.textColor = Color.white;
+
+            // 배경 박스
+            GUI.Box(new Rect(10, 10, 300, 80), "Pathfinding Status");
+
+            // 내부 텍스트 표시
+            GUILayout.BeginArea(new Rect(20, 35, 280, 100));
+            GUILayout.Label($"Running Tasks: {runningTasks.Count}", style);
+            GUILayout.Label($"Pending Requests: {pendingRequests.Count}", style);
+            GUILayout.EndArea();
+        }
 
         private void Update()
         {
@@ -51,14 +65,9 @@ namespace Octrees
 
         void ProcessPathfindingTasks()
         {
-            if (succeedAgents.Count > 0)
+            if (completeAgents.Count > 0)
             {
-                if (succeedAgents.TryDequeue(out var result)) result.agent.OnPathReady(result.path);
-            }
-
-            if (failedAgents.Count > 0)
-            {
-                if (failedAgents.TryDequeue(out var result)) result.OnPathFailed();
+                if (completeAgents.TryDequeue(out var result)) result.agent.OnPathReady(result.path, result.result);
             }
 
             runningTasks.RemoveAll(t => t.IsCompleted);
@@ -66,29 +75,22 @@ namespace Octrees
             if (pendingRequests.Count > 0 && runningTasks.Count < MaxConcurrentTasks)
             {
                 PathRequest req = pendingRequests.Dequeue();
-                List<Node> path = new();
                 Node start = graph.FindNode(req.startNode);
                 Node end = graph.FindNode(req.endNode);
                 if (start == null || end == null)
                 {
-                    req.agent.OnPathFailed();
+                    req.agent.OnPathInvaid();
                     return;
                 }
 
                 Task task = Task.Run(() =>
                 {
+                    List<Node> path = new();
                     PathfindingContext ctx = pool.Rent();
                     try
                     {
-                        bool success = graph.AStar(start, end, ref path, ctx);
-                        if (success)
-                        {
-                            succeedAgents.Enqueue((req.agent, path));
-                        }
-                        else
-                        {
-                            failedAgents.Enqueue(req.agent);
-                        }
+                        bool result = graph.AStar(start, end, ref path, ctx);
+                        completeAgents.Enqueue((req.agent, path, result));
                     }
                     finally
                     {
@@ -97,7 +99,6 @@ namespace Octrees
                 });
 
                 runningTasks.Add(task);
-                Debug.Log($"[Pathfinding] runningTasks, {runningTasks.Count}");
             }
         }
 
