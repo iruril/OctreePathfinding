@@ -19,11 +19,14 @@ namespace Octrees
         [SerializeField] private bool drawPathGizmos = false;
 
         //멀티스레드 환경에서 동시다발적인 Enqueue(), Dequeue()에 대응하기 위함 
-        private readonly ConcurrentQueue<(OctreeAgent agent, List<Node> path)> completedPaths = new();
+        private readonly ConcurrentQueue<(OctreeAgent agent, List<Node> path)> succeedAgents = new(); 
+        private readonly ConcurrentQueue<OctreeAgent> failedAgents = new();
         private readonly Queue<PathRequest> pendingRequests = new();
         private readonly List<Task> runningTasks = new();
 
         private const int MaxConcurrentTasks = 20;
+
+        private PathfindingContextPool pool = new();
 
         private void Awake()
         {
@@ -38,42 +41,69 @@ namespace Octrees
             for (int i = 0; i < levelParent.childCount; i++) LevelObjects[i] = levelParent.GetChild(i).gameObject;
             
             ot = new Octree(LevelObjects, minNodeSize, graph);
+            pool.Init(ot.graph.nodes.Count, MaxConcurrentTasks);
         }
 
         private void Update()
         {
-            if (completedPaths.TryDequeue(out var result)) result.agent.OnPathReady(result.path);
+            ProcessPathfindingTasks();
+        }
+
+        void ProcessPathfindingTasks()
+        {
+            if (succeedAgents.Count > 0)
+            {
+                if (succeedAgents.TryDequeue(out var result)) result.agent.OnPathReady(result.path);
+            }
+
+            if (failedAgents.Count > 0)
+            {
+                if (failedAgents.TryDequeue(out var result)) result.OnPathFailed();
+            }
 
             runningTasks.RemoveAll(t => t.IsCompleted);
 
             if (pendingRequests.Count > 0 && runningTasks.Count < MaxConcurrentTasks)
             {
                 PathRequest req = pendingRequests.Dequeue();
+                List<Node> path = new();
+                Node start = graph.FindNode(req.startNode);
+                Node end = graph.FindNode(req.endNode);
+                if (start == null || end == null)
+                {
+                    req.agent.OnPathFailed();
+                    return;
+                }
+
                 Task task = Task.Run(() =>
                 {
-                    List<Node> path = new();
-                    Node start = graph.FindNode(req.startNode);
-                    Node end = graph.FindNode(req.endNode); 
-                    
-                    if (start == null || end == null)
+                    PathfindingContext ctx = pool.Rent();
+                    try
                     {
-                        req.agent.OnPathFailed();
-                        return;
+                        bool success = graph.AStar(start, end, ref path, ctx);
+                        if (success)
+                        {
+                            succeedAgents.Enqueue((req.agent, path));
+                        }
+                        else
+                        {
+                            failedAgents.Enqueue(req.agent);
+                        }
                     }
-
-                    bool success = graph.AStar(start, end, ref path);
-                    if (success)
-                        completedPaths.Enqueue((req.agent, path));
+                    finally
+                    {
+                        pool.Return(ctx);
+                    }
                 });
 
                 runningTasks.Add(task);
+                Debug.Log($"[Pathfinding] runningTasks, {runningTasks.Count}");
             }
         }
 
         public void RequestPath(OctreeNode start, OctreeNode end, OctreeAgent agent)
         {
-            lock (pendingRequests)
-                pendingRequests.Enqueue(new PathRequest(start, end, agent));
+            pendingRequests.Enqueue(new PathRequest(start, end, agent));
         }
 
         private void OnDrawGizmos()

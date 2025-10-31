@@ -17,7 +17,8 @@ namespace Octrees
 
         List<Node> path = new();
 
-        public int GetPathLength() => path.Count;
+        public int GetPathLength() => path.Count; 
+        bool isRequestingPath = false;
 
         public OctreeNode GetPathNode(int index)
         {
@@ -33,7 +34,7 @@ namespace Octrees
         void Start()
         {
             currentNode = GetClosestNode(transform.position);
-            GetRandomDestination();
+            RequestRandomPath();
         }
 
         void Update()
@@ -42,7 +43,8 @@ namespace Octrees
 
             if (GetPathLength() == 0 || currentWaypoint >= GetPathLength())
             {
-                GetRandomDestination();
+                if (!isRequestingPath)
+                RequestRandomPath();
                 return;
             }
 
@@ -62,9 +64,9 @@ namespace Octrees
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), turnSpeed * Time.deltaTime);
                 transform.Translate(0, 0, speed * Time.deltaTime);
             }
-            else
+            else if (!isRequestingPath)
             {
-                GetRandomDestination();
+                RequestRandomPath();
             }
         }
 
@@ -73,8 +75,11 @@ namespace Octrees
             return OctreeBaker.Instance.ot.FindClosestNode(transform.position);
         }
 
-        void GetRandomDestination()
+        void RequestRandomPath()
         {
+            if (isRequestingPath) return;
+            isRequestingPath = true;
+
             OctreeNode destinationNode;
             destinationNode = OctreeBaker.Instance.graph.nodes.ElementAt(Random.Range(0, OctreeBaker.Instance.graph.nodes.Count)).Key;
             OctreeBaker.Instance.RequestPath(currentNode, destinationNode, this);
@@ -84,12 +89,14 @@ namespace Octrees
         {
             path = newPath;
             currentWaypoint = 0;
+            isRequestingPath = false;
         }
 
         public void OnPathFailed()
         {
+            isRequestingPath = false;
             Debug.LogWarning($"[{name}] Pathfinding failed ? retrying...");
-            Invoke(nameof(GetRandomDestination), 1.0f);
+            RequestRandomPath();
         }
 
         void OnDrawGizmos()

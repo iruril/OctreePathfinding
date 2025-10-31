@@ -1,6 +1,4 @@
-using NUnit;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Octrees
@@ -8,65 +6,61 @@ namespace Octrees
     public partial class Graph
     {
         const int maxIterations = 10000;
-        public bool AStar(Node start, Node end, ref List<Node> path)
+        public bool AStar(Node start, Node end, ref List<Node> path, PathfindingContext ctx)
         {
+            Debug.Log($"[A Star] Start");
             path.Clear();
-            var ctx = PathfindingContextPool.Rent(nodes.Count);
             ctx.BeginNewSearch();
 
-            try
+            var open = new SortedSet<Node>(new NodeComparer(ctx));
+
+            ctx.Activate(start.id);
+            ctx.g[start.id] = 0;
+            ctx.h[start.id] = Heuristic(start, end);
+            ctx.f[start.id] = ctx.h[start.id];
+            open.Add(start);
+
+            int iterations = 0;
+            while (open.Count > 0)
             {
-                var open = new SortedSet<Node>(new NodeComparer(ctx));
-
-                ctx.Activate(start.id);
-                ctx.g[start.id] = 0;
-                ctx.h[start.id] = Heuristic(start, end);
-                ctx.f[start.id] = ctx.h[start.id];
-                open.Add(start);
-
-                int iterations = 0;
-                while (open.Count > 0)
+                if (++iterations > maxIterations)
                 {
-                    if (++iterations > maxIterations)
-                        return false;
-
-                    Node current = open.Min;
-                    open.Remove(current);
-
-                    if (current == end)
-                    {
-                        ReconstructPath(current, ref path, ctx.from);
-                        return true;
-                    }
-
-                    ctx.closed[current.id] = true;
-
-                    foreach (var edge in current.edges)
-                    {
-                        Node neighbor = edge.x == current ? edge.y : edge.x;
-                        if (ctx.closed[neighbor.id]) continue;
-
-                        if (!ctx.IsActive(neighbor.id))
-                            ctx.Activate(neighbor.id);
-
-                        float tentativeG = ctx.g[current.id] + Heuristic(current, neighbor);
-                        if (tentativeG < ctx.g[neighbor.id])
-                        {
-                            ctx.from[neighbor.id] = current;
-                            ctx.g[neighbor.id] = tentativeG;
-                            ctx.h[neighbor.id] = Heuristic(neighbor, end);
-                            ctx.f[neighbor.id] = ctx.g[neighbor.id] + ctx.h[neighbor.id];
-                            open.Add(neighbor);
-                        }
-                    }
+                    Debug.Log($"[A Star] Fail - exceed clamp");
+                    return false;
                 }
 
-                return false;
+                Node current = open.Min;
+                open.Remove(current);
+
+                if (current == end)
+                {
+                    ReconstructPath(current, ref path, ctx.from);
+                    return true;
+                }
+
+                ctx.closed[current.id] = true;
+
+                foreach (var edge in current.edges)
+                {
+                    Node neighbor = edge.x == current ? edge.y : edge.x;
+                    if (ctx.closed[neighbor.id]) continue;
+
+                    if (!ctx.IsActive(neighbor.id))
+                        ctx.Activate(neighbor.id);
+
+                    float tentativeG = ctx.g[current.id] + Heuristic(current, neighbor);
+                    if (tentativeG < ctx.g[neighbor.id])
+                    {
+                        ctx.from[neighbor.id] = current;
+                        ctx.g[neighbor.id] = tentativeG;
+                        ctx.h[neighbor.id] = Heuristic(neighbor, end);
+                        ctx.f[neighbor.id] = ctx.g[neighbor.id] + ctx.h[neighbor.id];
+                        open.Add(neighbor);
+                    }
+                }
             }
-            finally
-            {
-                PathfindingContextPool.Return(ctx);
-            }
+
+            return false;
         }
 
         void ReconstructPath(Node node, ref List<Node> path, Node[] from)

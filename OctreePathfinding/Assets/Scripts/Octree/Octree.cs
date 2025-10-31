@@ -66,8 +66,8 @@ namespace Octrees
             
             BuildEdgesWithJob();
             Debug.LogFormat("[{0:F3}s] [Octree] Graph Created", Time.realtimeSinceStartup);
-            Debug.Log($"[Octree] {graph.nodes.Count} nodes created.");
-            Debug.Log($"[Octree] {graph.edges.Count} edges created.");
+            Debug.Log($"[Octree] {this.graph.nodes.Count} nodes created.");
+            Debug.Log($"[Octree] {this.graph.edges.Count} edges created.");
         }
 
         public OctreeNode FindClosestNode(Vector3 position) => FindClosestNode(root, position);

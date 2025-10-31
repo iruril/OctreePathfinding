@@ -3,23 +3,39 @@ using UnityEngine;
 
 namespace Octrees
 {
-    public static class PathfindingContextPool
+    public class PathfindingContextPool
     {
-        private static readonly Stack<PathfindingContext> _pool = new();
-        private static readonly object _lock = new();
+        private readonly Stack<PathfindingContext> _pool = new();
+        private readonly object _lock = new();
         private const int MaxContexts = 20;
+        private int nodeCount = 0;
 
-        public static PathfindingContext Rent(int nodeCount)
+        public void Init(int nodeCount, int initCount)
+        {
+            _pool.Clear(); 
+            this.nodeCount = nodeCount;
+            for (int i = 0; i < initCount; i++)
+            {
+                _pool.Push(new PathfindingContext(nodeCount));
+            }
+        }
+
+        public PathfindingContext Rent()
         {
             lock (_lock)
             {
                 if (_pool.Count > 0)
                     return _pool.Pop();
-                return new PathfindingContext(nodeCount);
+                else
+                {
+                    PathfindingContext ctx = new PathfindingContext(nodeCount);
+                    _pool.Push(ctx);
+                    return _pool.Pop();
+                }
             }
         }
 
-        public static void Return(PathfindingContext ctx)
+        public void Return(PathfindingContext ctx)
         {
             lock (_lock)
             {
