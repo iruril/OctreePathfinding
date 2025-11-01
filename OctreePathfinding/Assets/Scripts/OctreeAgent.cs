@@ -72,7 +72,7 @@ namespace Octrees
             if ((targetPos - rb.position).sqrMagnitude < accuracy * accuracy)
             {
                 currentWaypoint++;
-                if (currentWaypoint < path.Count)
+                if (currentWaypoint < GetPathLength())
                     currentNode = path[currentWaypoint].octreeNode;
             }
         }

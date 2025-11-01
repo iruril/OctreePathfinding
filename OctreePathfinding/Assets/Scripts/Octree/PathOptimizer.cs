@@ -6,6 +6,7 @@ namespace Octrees
 {
     public class PathOptimizer
     {
+        private static readonly RaycastHit[] _hits = new RaycastHit[1];
         public static List<Node> Simplify(List<Node> path, float size, LayerMask obstacleMask)
         {
             if (path == null || path.Count < 2)
@@ -19,10 +20,9 @@ namespace Octrees
 
             while (n < path.Count - 1)
             {
-                int t = n + 1;
                 Vector3 from = path[n].octreeNode.bounds.center;
-
-                for (; t < path.Count; t++)
+                int t;
+                for (t = n + 1; t < path.Count; t++)
                 {
                     Vector3 to = path[t].octreeNode.bounds.center;
 
@@ -37,6 +37,7 @@ namespace Octrees
                     {
                         optimized.Add(path[t]);
                         n = t;
+                        break;
                     }
                 }
 
@@ -53,7 +54,7 @@ namespace Octrees
             Vector3 dir = to - from;
             float dist = dir.magnitude;
             dir /= dist;
-            return Physics.SphereCast(from, size, dir, out var hitInfo, dist, mask);
+            return Physics.SphereCastNonAlloc(from, size, dir, _hits, dist, mask) > 0;
         }
     }
 }
