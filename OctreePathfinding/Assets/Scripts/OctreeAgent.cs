@@ -5,16 +5,20 @@ using UnityEngine;
 
 namespace Octrees
 {
+    [RequireComponent(typeof(Rigidbody))]
     public class OctreeAgent : MonoBehaviour
     {
         [SerializeField] private float speed = 5f;
         [SerializeField] private float accuracy = 1f;
-        [SerializeField] private float turnSpeed = 5f;
+        [SerializeField] private float turnSpeed = 180f;
         [SerializeField] private float size = 0.25f;
-
+        
+        Rigidbody rb;
         int currentWaypoint;
-        OctreeNode currentNode;
-        Vector3 destination;
+        OctreeNode currentNode; 
+        
+        Vector3 pendingMove = Vector3.zero;
+        Quaternion pendingRotation = Quaternion.identity;
 
         List<Node> path = new();
 
@@ -34,10 +38,43 @@ namespace Octrees
             return path[index].octreeNode;
         }
 
+        private void Awake()
+        {
+            rb = GetComponent<Rigidbody>();
+        }
+
         void Start()
         {
             currentNode = GetClosestNode(transform.position);
             RequestRandomPath();
+        }
+
+        void FixedUpdate()
+        {
+            if (OctreeBaker.Instance.graph == null) return;
+            if (path == null || path.Count == 0 || currentWaypoint >= path.Count) return;
+
+            Vector3 targetPos = currentNode.bounds.center;
+            Vector3 dirToTarget = (targetPos - rb.position);
+            Vector3 desiredDir = dirToTarget.normalized;
+
+            pendingRotation = Quaternion.LookRotation(desiredDir, Vector3.up);
+           
+            Vector3 moveDir = rb.transform.forward;
+
+            if (Physics.SphereCast(rb.position, size * 2f, moveDir, out var hit, size * 2f, OctreeBaker.Instance.obstacleMaskLayer))
+            {
+                moveDir = Vector3.ProjectOnPlane(moveDir, hit.normal).normalized;
+            }
+
+            pendingMove = rb.position + moveDir * speed * Time.fixedDeltaTime;
+
+            if ((targetPos - rb.position).sqrMagnitude < accuracy * accuracy)
+            {
+                currentWaypoint++;
+                if (currentWaypoint < path.Count)
+                    currentNode = path[currentWaypoint].octreeNode;
+            }
         }
 
         void Update()
@@ -46,31 +83,12 @@ namespace Octrees
 
             if (GetPathLength() == 0 || currentWaypoint >= GetPathLength())
             {
-                if (!isRequestingPath)
-                RequestRandomPath();
+                if (!isRequestingPath) RequestRandomPath();
                 return;
             }
 
-            if (Vector3.Distance(GetPathNode(currentWaypoint).bounds.center, transform.position) < accuracy)
-            {
-                currentWaypoint++;
-            }
-
-            if (currentWaypoint < GetPathLength())
-            {
-                currentNode = GetPathNode(currentWaypoint);
-                destination = currentNode.bounds.center;
-
-                Vector3 direction = destination - transform.position;
-                direction.Normalize();
-
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction), turnSpeed * Time.deltaTime);
-                transform.Translate(0, 0, speed * Time.deltaTime);
-            }
-            else if (!isRequestingPath)
-            {
-                RequestRandomPath();
-            }
+            rb.MovePosition(pendingMove);
+            rb.MoveRotation(Quaternion.RotateTowards(rb.rotation, pendingRotation, turnSpeed * Time.deltaTime));
         }
 
         OctreeNode GetClosestNode(Vector3 position)
