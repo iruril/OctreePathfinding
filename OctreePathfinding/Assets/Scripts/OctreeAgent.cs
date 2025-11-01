@@ -108,7 +108,7 @@ namespace Octrees
 
         public void OnPathReady(List<Node> newPath, bool result)
         {
-            path = PathOptimizer.Simplify(newPath, size, OctreeBaker.Instance.obstacleMaskLayer);
+            path = PathOptimizer.Simplify(newPath, OctreeBaker.Instance.obstacleMaskLayer);
             IsCompletePath = result;
             currentWaypoint = 0;
             isRequestingPath = false;
