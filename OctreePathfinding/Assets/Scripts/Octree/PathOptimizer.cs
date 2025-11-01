@@ -6,48 +6,45 @@ namespace Octrees
 {
     public class PathOptimizer
     {
-        private static readonly RaycastHit[] _hits = new RaycastHit[1];
-
-        public static List<Node> Simplify(List<Node> path, float size, LayerMask obstacleMask, float dirThreshold = 0.995f)
+        public static List<Node> Simplify(List<Node> path, float size, LayerMask obstacleMask)
         {
             if (path == null || path.Count < 2)
                 return path;
 
-            List<Node> simplified = new(path.Count);
-            simplified.Add(path[0]);
+            List<Node> optimized = new(path.Count);
+            int mask = obstacleMask.value;
 
             int n = 0;
-            Vector3 lastDir = Vector3.zero;
-            int mask = obstacleMask.value;
+            optimized.Add(path[n]);
 
             while (n < path.Count - 1)
             {
-                int lastVisible = n + 1;
+                int t = n + 1;
                 Vector3 from = path[n].octreeNode.bounds.center;
 
-                for (int t = n + 1; t < path.Count; t++)
+                for (; t < path.Count; t++)
                 {
                     Vector3 to = path[t].octreeNode.bounds.center;
-                    Vector3 dir = (to - from).normalized;
-
-                    if (t > n + 1 && Vector3.Dot(lastDir, dir) > dirThreshold)
-                    {
-                        lastVisible = t;
-                        continue;
-                    }
 
                     if (HasObstacle(from, to, size, mask))
+                    {
+                        n = t - 1;
+                        optimized.Add(path[n]);
                         break;
+                    }
 
-                    lastDir = dir;
-                    lastVisible = t;
+                    if (t == path.Count - 1)
+                    {
+                        optimized.Add(path[t]);
+                        n = t;
+                    }
                 }
 
-                simplified.Add(path[lastVisible]);
-                n = lastVisible;
+                if (t >= path.Count)
+                    break;
             }
 
-            return simplified;
+            return optimized;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -56,7 +53,7 @@ namespace Octrees
             Vector3 dir = to - from;
             float dist = dir.magnitude;
             dir /= dist;
-            return Physics.SphereCastNonAlloc(from, size, dir, _hits, dist, mask) > 0;
+            return Physics.SphereCast(from, size, dir, out var hitInfo, dist, mask);
         }
     }
 }

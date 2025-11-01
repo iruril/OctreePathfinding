@@ -61,8 +61,8 @@ namespace Octrees
             pendingRotation = Quaternion.LookRotation(desiredDir, Vector3.up);
            
             Vector3 moveDir = rb.transform.forward;
-
-            if (Physics.SphereCast(rb.position, size * 2f, moveDir, out var hit, size * 2f, OctreeBaker.Instance.obstacleMaskLayer))
+            float castValue = size * 1.5f;
+            if (Physics.SphereCast(rb.position, castValue, moveDir, out var hit, castValue, OctreeBaker.Instance.obstacleMaskLayer))
             {
                 moveDir = Vector3.ProjectOnPlane(moveDir, hit.normal).normalized;
             }

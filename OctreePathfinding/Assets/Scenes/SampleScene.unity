@@ -387,6 +387,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (28)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -767,6 +771,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (12)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1257,6 +1265,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (32)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1530,6 +1542,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1586,6 +1602,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (18)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1968,6 +1988,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2133,6 +2157,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (16)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2297,6 +2325,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2571,6 +2603,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (24)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2627,6 +2663,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (9)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2901,6 +2941,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (24)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3065,6 +3109,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (8)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3879,6 +3927,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (26)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4152,6 +4204,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4317,6 +4373,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (15)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4373,6 +4433,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (14)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -4863,6 +4927,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (27)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -4919,6 +4987,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (23)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5084,6 +5156,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5587,6 +5663,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5752,6 +5832,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (18)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5916,6 +6000,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (22)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6543,6 +6631,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -6707,6 +6799,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (7)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -6873,6 +6969,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (21)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7038,6 +7138,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (30)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7094,6 +7198,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (28)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7259,6 +7367,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (20)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7533,6 +7645,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7806,6 +7922,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (17)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -7862,6 +7982,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -8941,6 +9065,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (25)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8997,6 +9125,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (11)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -9703,6 +9835,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10192,6 +10328,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (31)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10357,6 +10497,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (14)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10521,6 +10665,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (15)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10795,6 +10943,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (29)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10851,6 +11003,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (21)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -10909,6 +11065,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -10965,6 +11125,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (19)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11239,6 +11403,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11404,6 +11572,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (23)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -11460,6 +11632,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (22)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -11950,6 +12126,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (31)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12439,6 +12619,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (13)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12495,6 +12679,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (27)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13201,6 +13389,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (30)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -13365,6 +13557,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (26)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -14576,6 +14772,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (29)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -14740,6 +14940,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -15662,6 +15866,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (32)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -16475,6 +16683,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (11)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -17072,6 +17284,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Intercepter (17)
       objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -17453,6 +17669,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -17509,6 +17729,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (19)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17998,6 +18222,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (20)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -18596,6 +18824,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (16)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -18977,6 +19209,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (12)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -19033,6 +19269,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19199,6 +19439,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: TIE_Defender (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -19363,6 +19607,10 @@ PrefabInstance:
     - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
       propertyPath: m_Name
       value: TIE_Defender (13)
+      objectReference: {fileID: 0}
+    - target: {fileID: 4597249132054219238, guid: f76f8fd0aa18d9345a38be9770678967, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -19852,6 +20100,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -20449,6 +20701,10 @@ PrefabInstance:
     - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
       propertyPath: m_Name
       value: TIE_Intercepter (25)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5769513854721969173, guid: cb142fa5db704e44c81f1b744f0184e2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
