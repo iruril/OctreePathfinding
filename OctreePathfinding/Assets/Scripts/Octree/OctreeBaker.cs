@@ -10,6 +10,8 @@ namespace Octrees
         public static OctreeBaker Instance = null;
 
         [SerializeField] Transform levelParent;
+        [SerializeField] LayerMask obstacleMask;
+        public LayerMask obstacleMaskLayer => obstacleMask;
         public GameObject[] LevelObjects { get; private set; } = new GameObject[0];
         public float minNodeSize = 1f;
         public Octree ot;

@@ -10,6 +10,7 @@ namespace Octrees
         [SerializeField] private float speed = 5f;
         [SerializeField] private float accuracy = 1f;
         [SerializeField] private float turnSpeed = 5f;
+        [SerializeField] private float size = 0.25f;
 
         int currentWaypoint;
         OctreeNode currentNode;
@@ -89,7 +90,7 @@ namespace Octrees
 
         public void OnPathReady(List<Node> newPath, bool result)
         {
-            path = newPath;
+            path = PathOptimizer.Simplify(newPath, size, OctreeBaker.Instance.obstacleMaskLayer);
             IsCompletePath = result;
             currentWaypoint = 0;
             isRequestingPath = false;
