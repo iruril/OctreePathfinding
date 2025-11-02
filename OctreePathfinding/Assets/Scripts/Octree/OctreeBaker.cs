@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using UnityEngine;
+using System.Linq;
 
 namespace Octrees
 {
@@ -12,7 +13,6 @@ namespace Octrees
         [SerializeField] Transform levelParent;
         [SerializeField] LayerMask obstacleMask;
         public LayerMask obstacleMaskLayer => obstacleMask;
-        public GameObject[] LevelObjects { get; private set; } = new GameObject[0];
         public float minNodeSize = 1f;
         public Octree ot;
 
@@ -25,7 +25,7 @@ namespace Octrees
         private readonly Queue<PathRequest> pendingRequests = new();
         private readonly List<Task> runningTasks = new();
 
-        private const int MaxConcurrentTasks = 8;
+        private int maxConcurrentTasks;
 
         private PathfindingContextPool pool = new();
 
@@ -38,11 +38,14 @@ namespace Octrees
                 return;
             }
 
-            LevelObjects = new GameObject[levelParent.childCount];
-            for (int i = 0; i < levelParent.childCount; i++) LevelObjects[i] = levelParent.GetChild(i).gameObject;
-            
-            ot = new Octree(LevelObjects, minNodeSize, graph);
-            pool.Init(ot.graph.nodes.Count, MaxConcurrentTasks);
+            MeshFilter[] LevelMeshs = levelParent.GetComponentsInChildren<MeshFilter>(includeInactive: false);
+
+            ot = new Octree(LevelMeshs, minNodeSize, graph);
+
+            int logicalCores = System.Environment.ProcessorCount;
+            maxConcurrentTasks = Mathf.Clamp(logicalCores / 2, 2, 8);
+
+            pool.Init(ot.graph.nodes.Count, maxConcurrentTasks);
         }
         private void OnGUI()
         {
@@ -51,10 +54,11 @@ namespace Octrees
             style.normal.textColor = Color.white;
 
             // 배경 박스
-            GUI.Box(new Rect(10, 10, 300, 80), "Pathfinding Status");
+            GUI.Box(new Rect(10, 10, 300, 120), "Octree Pathfinding Status");
 
             // 내부 텍스트 표시
             GUILayout.BeginArea(new Rect(20, 35, 280, 100));
+            GUILayout.Label($"Max Concurrent Tasks: {maxConcurrentTasks}", style);
             GUILayout.Label($"Running Tasks: {runningTasks.Count}", style);
             GUILayout.Label($"Pending Requests: {pendingRequests.Count}", style);
             GUILayout.EndArea();
@@ -74,7 +78,7 @@ namespace Octrees
 
             runningTasks.RemoveAll(t => t.IsCompleted);
 
-            if (pendingRequests.Count > 0 && runningTasks.Count < MaxConcurrentTasks)
+            if (pendingRequests.Count > 0 && runningTasks.Count < maxConcurrentTasks)
             {
                 PathRequest req = pendingRequests.Dequeue();
                 Node start = graph.FindNode(req.startNode);

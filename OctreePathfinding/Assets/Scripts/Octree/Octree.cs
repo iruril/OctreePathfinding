@@ -52,19 +52,20 @@ namespace Octrees
 
         List<OctreeNode> emptyLeaves = new();
 
-        public Octree(GameObject[] worldObjects, float minNodeSize, Graph graph)
+        public Octree(MeshFilter[] levelMeshs, float minNodeSize, Graph graph)
         {
             this.graph = graph;
             Debug.LogFormat("[{0:F3}s] [Octree] Bound Calc Start", Time.realtimeSinceStartup);
-            CalculateBounds(worldObjects);
+            CalculateBounds(levelMeshs);
             Debug.LogFormat("[{0:F3}s] [Octree] Bound Calc End", Time.realtimeSinceStartup);
-            CreateTree(worldObjects, minNodeSize);
+            CreateTree(levelMeshs, minNodeSize);
             Debug.LogFormat("[{0:F3}s] [Octree] Tree Created", Time.realtimeSinceStartup);
 
             GetEmptyLeaves();
             Debug.LogFormat("[{0:F3}s] [Octree] Creating Graph with Empty Leaf Node", Time.realtimeSinceStartup);
             
             BuildEdgesWithJob();
+            this.graph.SetMaxInterations();
             Debug.LogFormat("[{0:F3}s] [Octree] Graph Created", Time.realtimeSinceStartup);
             Debug.Log($"[Octree] {this.graph.nodes.Count} nodes created.");
             Debug.Log($"[Octree] {this.graph.edges.Count} edges created.");
@@ -181,25 +182,60 @@ namespace Octrees
             edgeList.Dispose();
         }
 
-        void CreateTree(GameObject[] worldObjects, float minNodeSize)
+        void CreateTree(MeshFilter[] levelMeshs, float minNodeSize)
         {
             root = new OctreeNode(bounds, minNodeSize);
 
-            foreach (var obj in worldObjects)
+            foreach (var meshFilter in levelMeshs)
             {
-                root.Divide(obj);
+                root.Divide(meshFilter);
             }
         }
 
-        void CalculateBounds(GameObject[] worldObjects)
+        void CalculateBounds(MeshFilter[] levelMeshs)
         {
-            foreach (var obj in worldObjects)
+            if (levelMeshs == null || levelMeshs.Length == 0)
+                return;
+
+            bool initialized = false;
+            Bounds totalBounds = new Bounds();
+
+            foreach (var mf in levelMeshs)
             {
-                bounds.Encapsulate(obj.GetComponent<Collider>().bounds);
+                if (mf == null || mf.sharedMesh == null)
+                    continue;
+
+                Bounds meshBounds = TransformBounds(mf.sharedMesh.bounds, mf.transform.localToWorldMatrix);
+
+                if (!initialized)
+                {
+                    totalBounds = meshBounds;
+                    initialized = true;
+                }
+                else
+                {
+                    totalBounds.Encapsulate(meshBounds);
+                }
             }
 
-            Vector3 size = Vector3.one * Mathf.Max(bounds.size.x, bounds.size.y, bounds.size.z) * 0.6f;
-            bounds.SetMinMax(bounds.center - size, bounds.center + size);
+            Vector3 size = Vector3.one * Mathf.Max(totalBounds.size.x, totalBounds.size.y, totalBounds.size.z) * 0.6f;
+            bounds.SetMinMax(totalBounds.center - size, totalBounds.center + size);
+        }
+
+        Bounds TransformBounds(Bounds localBounds, Matrix4x4 localToWorld)
+        {
+            var center = localToWorld.MultiplyPoint3x4(localBounds.center);
+
+            var extents = localBounds.extents;
+            var axisX = localToWorld.MultiplyVector(new Vector3(extents.x, 0, 0));
+            var axisY = localToWorld.MultiplyVector(new Vector3(0, extents.y, 0));
+            var axisZ = localToWorld.MultiplyVector(new Vector3(0, 0, extents.z));
+
+            extents.x = Mathf.Abs(axisX.x) + Mathf.Abs(axisY.x) + Mathf.Abs(axisZ.x);
+            extents.y = Mathf.Abs(axisX.y) + Mathf.Abs(axisY.y) + Mathf.Abs(axisZ.y);
+            extents.z = Mathf.Abs(axisX.z) + Mathf.Abs(axisY.z) + Mathf.Abs(axisZ.z);
+
+            return new Bounds(center, extents * 2);
         }
 
         #region  Obsoleted Logics

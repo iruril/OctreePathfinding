@@ -5,7 +5,9 @@ namespace Octrees
 {
     public partial class Graph
     {
-        const int maxIterations = 20000;
+        int maxIterations;
+        public void SetMaxInterations() => maxIterations = nodes.Count * 3;
+
         public bool AStar(Node start, Node end, ref List<Node> path, PathfindingContext ctx)
         {
             path.Clear();
@@ -86,7 +88,7 @@ namespace Octrees
             path.Reverse();
         }
 
-        float Heuristic(Node a, Node b) => (a.octreeNode.bounds.center - b.octreeNode.bounds.center).sqrMagnitude;
+        float Heuristic(Node a, Node b) => (a.octreeNode.bounds.center - b.octreeNode.bounds.center).magnitude;
 
         public Node FindNode(OctreeNode octreeNode)
         {

@@ -33,7 +33,7 @@ namespace Octrees
             }
         }
 
-        public void Divide(GameObject obj) => Divide(new OctreeObject(obj));
+        public void Divide(MeshFilter meshFilter) => Divide(new OctreeObject(meshFilter));
 
         void Divide(OctreeObject octreeObject)
         {
