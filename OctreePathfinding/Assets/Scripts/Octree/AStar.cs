@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Octrees
@@ -17,7 +18,7 @@ namespace Octrees
 
             ctx.Activate(start.id);
             ctx.g[start.id] = 0;
-            ctx.h[start.id] = Heuristic(start, end);
+            ctx.h[start.id] = Heuristic(start.octreeNode.bounds.center, end.octreeNode.bounds.center);
             ctx.f[start.id] = ctx.h[start.id];
             open.Add(start);
 
@@ -29,7 +30,6 @@ namespace Octrees
             {
                 if (++iterations > maxIterations)
                 {
-                    //Debug.Log($"[A Star] Fail - exceed clamp");
                     ReconstructPath(bestSoFar, ref path, ctx.from);
                     return false;
                 }
@@ -45,7 +45,7 @@ namespace Octrees
 
                 ctx.closed[current.id] = true; 
 
-                float distToEnd = Heuristic(current, end);
+                float distToEnd = Heuristic(current.octreeNode.bounds.center, end.octreeNode.bounds.center);
                 if (distToEnd < bestDistance)
                 {
                     bestDistance = distToEnd;
@@ -61,12 +61,12 @@ namespace Octrees
 
                     if (ctx.closed[neighbor.id]) continue;
 
-                    float tentativeG = ctx.g[current.id] + Heuristic(current, neighbor);
+                    float tentativeG = ctx.g[current.id] + Heuristic(current.octreeNode.bounds.center, neighbor.octreeNode.bounds.center);
                     if (tentativeG < ctx.g[neighbor.id])
                     {
                         ctx.from[neighbor.id] = current;
                         ctx.g[neighbor.id] = tentativeG;
-                        ctx.h[neighbor.id] = Heuristic(neighbor, end);
+                        ctx.h[neighbor.id] = Heuristic(neighbor.octreeNode.bounds.center, end.octreeNode.bounds.center);
                         ctx.f[neighbor.id] = ctx.g[neighbor.id] + ctx.h[neighbor.id];
                         open.Add(neighbor);
                     }
@@ -88,7 +88,7 @@ namespace Octrees
             path.Reverse();
         }
 
-        float Heuristic(Node a, Node b) => (a.octreeNode.bounds.center - b.octreeNode.bounds.center).magnitude;
+        float Heuristic(float3 a, float3 b) => math.distance(a, b);
 
         public Node FindNode(OctreeNode octreeNode)
         {

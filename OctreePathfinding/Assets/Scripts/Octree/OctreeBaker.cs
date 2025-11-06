@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using UnityEngine;
-using System.Linq;
 
 namespace Octrees
 {
@@ -25,7 +24,7 @@ namespace Octrees
         private readonly Queue<PathRequest> pendingRequests = new();
         private readonly List<Task> runningTasks = new();
 
-        private int maxConcurrentTasks;
+        private const int maxConcurrentTasks = 2;
 
         private PathfindingContextPool pool = new();
 
@@ -41,10 +40,6 @@ namespace Octrees
             MeshFilter[] LevelMeshs = levelParent.GetComponentsInChildren<MeshFilter>(includeInactive: false);
 
             ot = new Octree(LevelMeshs, minNodeSize, graph);
-
-            int logicalCores = System.Environment.ProcessorCount;
-            maxConcurrentTasks = Mathf.Clamp(logicalCores / 2, 2, 8);
-
             pool.Init(ot.graph.nodes.Count, maxConcurrentTasks);
         }
         private void OnGUI()
