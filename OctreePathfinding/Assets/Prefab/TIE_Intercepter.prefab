@@ -370,7 +370,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.35
+  m_Radius: 0.3
   m_Center: {x: 0, y: 0, z: 0.1}
 --- !u!54 &7040145921113084597
 Rigidbody:
@@ -411,10 +411,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 704305dcbc332bc468ad0b1f16a32e05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 8
+  speed: 5
   accuracy: 2
   turnSpeed: 360
-  size: 0.5
+  sensorDistance: 3
+  avoidanceStrength: 0.3
 --- !u!1001 &6590983404281656473
 PrefabInstance:
   m_ObjectHideFlags: 0
