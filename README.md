@@ -32,10 +32,21 @@
 
 ---
 
+## 📸 Demo
+
+[![Video Label](http://img.youtube.com/vi/J1d0SdvNlTk/0.jpg)](https://www.youtube.com/watch?v=J1d0SdvNlTk)
+
+---
+
 ## 🛠 핵심 기술 및 구현 (Key Implementation)
 
 ### 1. Octree 공간 분할 및 그래프 생성
 맵 전체를 감싸는 Bounding Box에서 시작하여, 장애물(Mesh)과 충돌하는 노드를 재귀적으로 8등분합니다.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/b043b4ba-31ef-42d9-9665-f8287a5358e7" width="60%">
+  <br>
+  <em>Loose Octree 시각화: 장애물 주변은 세밀하게(Dense), 빈 공간은 크게(Sparse) 분할됨</em>
+</p>
 * **Loose Octree 접근:** `MeshFilter`의 버텍스를 월드 좌표로 변환해 정확한 AABB(Axis-Aligned Bounding Box)를 계산합니다.
 * **재귀적 분할:** 설정된 `minNodeSize`에 도달하거나, 내부에 장애물이 없을 때까지 분할을 반복합니다.
 * **빈 공간 추출:** `Empty Leaves`를 추출하여 이동 가능한 노드로 간주하고 그래프를 생성합니다.
@@ -65,12 +76,6 @@ public struct BuildEdgesJob : IJobParallelFor
     }
 }
 ```
-> **성과:** 노드 1,000개 이상의 그래프 환경에서 그래프 생성 시간을 기존 대비 **약 10배 이상 단축**했습니다.
-
-| **Optimization Before** | **Optimization After** |
-| :---: | :---: |
-| ![Before](https://github.com/user-attachments/assets/351fa8e8-9192-4fdb-9d65-0e7a4a91bae0) | ![After](https://github.com/user-attachments/assets/3737b779-a907-4224-83f0-b2af37592836) |
-| *Graph Build: 11.75s* | *Graph Build: 1.12s* |
 
 ### 3. Zero-Allocation A* Pathfinding (메모리 최적화)
 A* 알고리즘은 잦은 호출로 인해 `List`, `Dictionary`, `HashSet` 등의 가비지 생성(GC Allocation)이 많습니다. 이를 해결하기 위해 **Context Pooling**과 **Timestamping** 기법을 적용했습니다.
@@ -114,6 +119,20 @@ Task task = Task.Run(() =>
 
 ### 5. String Pulling & Local Avoidance
 * **Path Optimization:** 격자(Grid) 단위의 이동으로 인한 부자연스러운 "지그재그" 움직임을 `Physics.Raycast`를 이용한 **String Pulling** 기법으로 직선화했습니다. (`PathOptimizer.cs`)
+<table>
+  <tr>
+    <td align="center">
+      <img src="(여기에_Before_이미지_URL_넣기)" width="100%">
+      <br>
+      <b>Before: Raw Path (ZigZag)</b>
+    </td>
+    <td align="center">
+      <img src="(여기에_After_이미지_URL_넣기)" width="100%">
+      <br>
+      <b>After: String Pulling (Smooth)</b>
+    </td>
+  </tr>
+</table>
 * **Local Avoidance:** 경로를 따라가되, 갑작스러운 장애물을 피하기 위해 Raycast 센서를 이용한 **Weighted Steering**을 적용하여 유동적인 움직임을 구현했습니다. (`OctreeAgent.cs`)
 
 ---
@@ -150,10 +169,10 @@ Task task = Task.Run(() =>
 
 > *테스트 환경: 150개 Level Objects, Node 13,867개 기준*
 
----
-
-## 📸 Demo
-[![Video Label](http://img.youtube.com/vi/J1d0SdvNlTk/0.jpg)](https://www.youtube.com/watch?v=J1d0SdvNlTk)
+| **Optimization Before** | **Optimization After** |
+| :---: | :---: |
+| ![Before](https://github.com/user-attachments/assets/351fa8e8-9192-4fdb-9d65-0e7a4a91bae0) | ![After](https://github.com/user-attachments/assets/3737b779-a907-4224-83f0-b2af37592836) |
+| *Mainthread-Only Graph Build: 11.75s* | *Job & Burst based Graph Build: 1.12s* |
 
 ---
 
