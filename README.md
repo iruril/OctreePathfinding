@@ -53,6 +53,7 @@
   <br>
   <em>Loose Octree 시각화: 장애물 주변은 세밀하게(Dense), 빈 공간은 크게(Sparse) 분할됨</em>
 </p>
+
 * **Loose Octree 접근:** `MeshFilter`의 버텍스를 월드 좌표로 변환해 정확한 AABB(Axis-Aligned Bounding Box)를 계산합니다.
 * **재귀적 분할:** 설정된 `minNodeSize`에 도달하거나, 내부에 장애물이 없을 때까지 분할을 반복합니다.
 * **빈 공간 추출:** `Empty Leaves`를 추출하여 이동 가능한 노드로 간주하고 그래프를 생성합니다.
