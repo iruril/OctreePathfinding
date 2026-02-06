@@ -1,4 +1,4 @@
-# 🌌 Unity 3D Volumetric Pathfinding System (Octree & A*)
+# Unity 3D Volumetric Pathfinding System (Octree & A*)
 
 ![Unity](https://img.shields.io/badge/Unity-6000.0%2B-black?logo=unity) ![C#](https://img.shields.io/badge/Language-C%23-blue?logo=csharp) ![JobSystem](https://img.shields.io/badge/Tech-Job%20System-red) ![BurstCompile](https://img.shields.io/badge/Tech-Burst%20Compile-green) ![Async](https://img.shields.io/badge/Tech-Async%2FTask-blueviolet)
 
@@ -8,7 +8,7 @@
 
 ---
 
-## 📖 목차
+## 목차
 1. [프로젝트 개요 (Overview)](#-프로젝트-개요-overview)
 2. [핵심 기술 및 구현 (Key Implementation)](#-핵심-기술-및-구현-key-implementation)
     - [1. Octree 공간 분할 및 그래프 생성](#1-octree-공간-분할-및-그래프-생성)
@@ -22,17 +22,17 @@
 
 ---
 
-## 🚀 프로젝트 개요 (Overview)
+## 프로젝트 개요 (Overview)
 기존 Unity NavMesh는 바닥을 걷는 캐릭터에 최적화되어 있어, 공중을 나는 드론이나 우주선 같은 오브젝트의 길찾기에는 적합하지 않습니다. 본 프로젝트는 이를 해결하기 위해 **빈 공간**을 노드로 연결하여 그래프를 구축하고, 3차원 A* 알고리즘을 수행합니다.
 
-### 🎯 주요 목표
+### 주요 목표
 * **Full 3D Navigation:** x, y, z 축을 모두 활용한 자유로운 경로 탐색.
 * **High Performance:** 실시간 게임플레이를 저해하지 않는 고성능 연산.
 * **GC Spike 방지:** 런타임 메모리 할당을 최소화하여 프레임 드랍 방지.
 
 ---
 
-## 📸 Demo
+## Demo
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=J1d0SdvNlTk">
@@ -44,7 +44,7 @@
 
 ---
 
-## 🛠 핵심 기술 및 구현 (Key Implementation)
+## 핵심 기술 및 구현 (Key Implementation)
 
 ### 1. Octree 공간 분할 및 그래프 생성
 맵 전체를 감싸는 Bounding Box에서 시작하여, 장애물(Mesh)과 충돌하는 노드를 재귀적으로 8등분합니다.
@@ -145,7 +145,7 @@ Task task = Task.Run(() =>
 
 ---
 
-## 🧠 기술적 도전 및 해결 (Troubleshooting & Optimization)
+## 기술적 도전 및 해결 (Troubleshooting & Optimization)
 
 ### 1. 그래프 빌드 병목 해결: Spatial Hashing vs Job System
 * **Problem:** 13,000개 이상의 노드를 생성할 때, 노드 간 인접성 전수 조사 $O(N^2)$으로 인해 베이킹 시간이 10초 이상 소요되는 병목이 발생했습니다.
@@ -167,7 +167,7 @@ Task task = Task.Run(() =>
 
 ---
 
-## 📊 성과 및 성능 지표 (Performance)
+## 성과 및 성능 지표 (Performance)
 
 | 최적화 항목 | 적용 전 (Before) | 적용 후 (After) | 개선 결과 |
 |:---:|:---:|:---:|:---|
@@ -184,7 +184,7 @@ Task task = Task.Run(() =>
 
 ---
 
-## 📂 설치 및 사용법 (Installation)
+## 설치 및 사용법 (Installation)
 
 1. **설정 (Setup)**
    - Level의 부모 오브젝트를 `OctreeBaker` 컴포넌트의 `levelParent`에 등록합니다.
@@ -197,7 +197,7 @@ Task task = Task.Run(() =>
 
 ---
 
-### 📬 Contact
+### Contact
 * **GitHub:** [https://github.com/iruril](https://github.com/iruril)
 * **Email:** [gksxodnr99@gmail.com](mailto:gksxodnr99@gmail.com)
 
