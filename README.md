@@ -122,14 +122,14 @@ Task task = Task.Run(() =>
 <table>
   <tr>
     <td align="center">
-      <img src="(여기에_Before_이미지_URL_넣기)" width="100%">
+      <img src="https://github.com/user-attachments/assets/1d4ce984-db7a-4a24-8232-479031e2f901" width="100%">
       <br>
       <b>Before: Raw Path (ZigZag)</b>
     </td>
     <td align="center">
-      <img src="(여기에_After_이미지_URL_넣기)" width="100%">
+      <img src="https://github.com/user-attachments/assets/c6bdd5bb-d877-4d09-bbfa-9700375535f5" width="100%">
       <br>
-      <b>After: String Pulling (Smooth)</b>
+      <b>After: String Pulling (Straight)</b>
     </td>
   </tr>
 </table>
