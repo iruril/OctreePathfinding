@@ -9,16 +9,16 @@
 ---
 
 ## 목차
-1. [프로젝트 개요 (Overview)](#-프로젝트-개요-overview)
-2. [핵심 기술 및 구현 (Key Implementation)](#-핵심-기술-및-구현-key-implementation)
+1. [프로젝트 개요 (Overview)](#프로젝트-개요-overview)
+2. [핵심 기술 및 구현 (Key Implementation)](#핵심-기술-및-구현-key-implementation)
     - [1. Octree 공간 분할 및 그래프 생성](#1-octree-공간-분할-및-그래프-생성)
     - [2. C# Job System을 활용한 병렬 처리](#2-c-job-system을-활용한-병렬-처리-optimization)
     - [3. Zero-Allocation A* Pathfinding (메모리 최적화)](#3-zero-allocation-a-pathfinding-메모리-최적화)
     - [4. Async/Await 기반 멀티스레딩](#4-asyncawait-기반-멀티스레딩)
     - [5. String Pulling & Local Avoidance](#5-string-pulling--local-avoidance)
-3. [기술적 도전 및 해결 (Troubleshooting & Optimization)](#-기술적-도전-및-해결-troubleshooting--optimization)
-4. [성과 및 성능 지표 (Performance)](#-성과-및-성능-지표-performance)
-5. [설치 및 사용법 (Installation)](#-설치-및-사용법-installation)
+3. [기술적 도전 및 해결 (Troubleshooting & Optimization)](#기술적-도전-및-해결-troubleshooting--optimization)
+4. [성과 및 성능 지표 (Performance)](#성과-및-성능-지표-performance)
+5. [설치 및 사용법 (Installation)](#설치-및-사용법-installation)
 
 ---
 
