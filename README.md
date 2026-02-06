@@ -139,6 +139,7 @@ Task task = Task.Run(() =>
     </td>
   </tr>
 </table>
+
 * **Local Avoidance:** 경로를 따라가되, 갑작스러운 장애물을 피하기 위해 Raycast 센서를 이용한 **Weighted Steering**을 적용하여 유동적인 움직임을 구현했습니다. (`OctreeAgent.cs`)
 
 ---
