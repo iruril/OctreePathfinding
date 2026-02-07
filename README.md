@@ -114,6 +114,7 @@ public bool IsActive(int id) => stamp[id] == currentStamp;
 
 //멀티스레드 환경에서 동시다발적인 Enqueue(), Dequeue()에 대응하기 위함 
 private readonly ConcurrentQueue<(OctreeAgent agent, List<Node> path, bool result)> completeAgents = new();
+
 Task task = Task.Run(() =>
 {
     PathfindingContext ctx = pool.Rent(); // 풀에서 컨텍스트 대여, 내부적으로 ConcurrentStack을 사용중.
