@@ -107,13 +107,16 @@ public bool IsActive(int id) => stamp[id] == currentStamp;
 경로 탐색 요청이 메인 스레드를 차단(Block)하지 않도록 `Task`와 `ConcurrentQueue`를 활용한 비동기 시스템을 구축했습니다.
 
 * **Throttling:** `maxConcurrentTasks`를 두어 동시에 실행되는 탐색 작업 수를 제한, CPU 점유율을 관리합니다.
-* **Thread-Safety:** `ConcurrentStack`을 사용한 풀링과 스레드 안전한 큐 시스템을 구현했습니다.
+* **Thread-Safety:** `ConcurrentStack`을 사용한 풀링과 `ConcurrentQueue`를 활용해 스레드 안전한 경로 요청 반환 시스템을 구현했습니다.
 
 ```csharp
 // OctreeBaker.cs
+
+//멀티스레드 환경에서 동시다발적인 Enqueue(), Dequeue()에 대응하기 위함 
+private readonly ConcurrentQueue<(OctreeAgent agent, List<Node> path, bool result)> completeAgents = new();
 Task task = Task.Run(() =>
 {
-    PathfindingContext ctx = pool.Rent(); // 풀에서 컨텍스트 대여
+    PathfindingContext ctx = pool.Rent(); // 풀에서 컨텍스트 대여, 내부적으로 ConcurrentStack을 사용중.
     try
     {
         // 별도 스레드에서 무거운 A* 연산 수행
