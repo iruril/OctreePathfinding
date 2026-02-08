@@ -24,7 +24,7 @@ namespace Octrees
         private readonly Queue<PathRequest> pendingRequests = new();
         private readonly List<Task> runningTasks = new();
 
-        private const int maxConcurrentTasks = 2;
+        private const int maxConcurrentTasks = 6;
 
         private PathfindingContextPool pool = new();
 
