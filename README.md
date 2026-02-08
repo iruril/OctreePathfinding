@@ -177,14 +177,23 @@ Task task = Task.Run(() =>
 |:---:|:---:|:---:|:---|
 | **그래프 생성 (Build)** | 11.753초 | **1.117초** | **약 10.5배 단축** |
 | **메모리 할당 (GC)** | ~24KB / Request | **0KB (Zero Alloc)** | GC 프레임 드랍 제거 |
-| **평균 프레임 (FPS)** | 95 fps | **300 fps** | 연산 효율 증가 |
+| **평균 프레임 (FPS)** | 75~90 fps | **120~145 fps** | 연산 효율 증가 |
 
-> *테스트 환경: 150개 Level Objects, Node 13,867개 기준*
-
-| **Optimization Before** | **Optimization After** |
+* ### Graph Build
+| **Mainthread-Only** | **Job & Burst** |
 | :---: | :---: |
 | ![Before](https://github.com/user-attachments/assets/351fa8e8-9192-4fdb-9d65-0e7a4a91bae0) | ![After](https://github.com/user-attachments/assets/3737b779-a907-4224-83f0-b2af37592836) |
 | *Mainthread-Only Graph Build: 11.75s* | *Job & Burst based Graph Build: 1.12s* |
+> *테스트 환경 : 150개 Level Objects, Node 13,867개 기준*
+
+* ### Path Request & A*
+| **Mainthread-Only** | **Concurrent & PathContextPool** |
+| :---: | :---: |
+| ![Before](https://github.com/user-attachments/assets/c03d707b-66a6-4a0e-beee-b80a3ebf1b85) | ![After](https://github.com/user-attachments/assets/4db5c8ab-e925-447b-bf83-1cd124e0b07f) |
+| *Mainthread-Only: 89 FPS* | *Concurrent & PathContextPool: 132 FPS* |
+> *테스트 환경 : 100개 OctreeAgents, Node 13,867개 기준*
+> 
+> *참고 : Concurrent & PathContextPool 환경에서는 Local-Avoidance와 Path Optimizer도 연산 중.*
 
 ---
 
