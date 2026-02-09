@@ -58,6 +58,31 @@
 * **재귀적 분할:** 설정된 `minNodeSize`에 도달하거나, 내부에 장애물이 없을 때까지 분할을 반복합니다.
 * **빈 공간 추출:** `Empty Leaves`를 추출하여 이동 가능한 노드로 간주하고 그래프를 생성합니다.
 
+```mermaid
+graph LR
+    subgraph Step1 [1. Create Nodes]
+        direction TB
+        A[Level Meshes] --> B(Octree Nodes)
+        B --> C[Empty Leaves]
+    end
+
+    subgraph Step2 [2. Create Edges]
+        direction TB
+        D{BuildEdgesJob<br>Burst Compile} --> E[AddEdges]
+    end
+
+    subgraph Step3 [3. Build Graph]
+        direction TB
+        F[Pathfinding Graph]
+    end
+
+    C -.->|데이터 복사| D
+    E -->|결과 병합| F
+
+    class Result result;
+```
+> *Octree 생성과 Pathfinding Graph 생성 흐름*
+
 ### 2. C# Job System을 활용한 병렬 처리 (Optimization)
 초기 구현 시 $O(N^2)$의 복잡도를 가지는 "노드 간 인접성 검사(Edge Building)" 로직이 메인 스레드에서 병목을 일으켰습니다. 이를 **Unity Job System** 및 **Burst Compile**을 도입하여 해결했습니다.
 
@@ -103,6 +128,41 @@ public void Activate(int id)
 public bool IsActive(int id) => stamp[id] == currentStamp;
 ```
 
+```mermaid
+graph LR
+    subgraph MemoryPool [Resource Management]
+        Pool[("PathfindingContext Pool
+        (ConcurrentStack)")]
+    end
+
+    subgraph Optimization [Timestamping Logic]
+        Rent[1. Rent Context]
+        
+        CheckStamp{"2. Stamp == int.Max ?"}
+        
+        HeavyReset["3-A. Full Reset(Array.Fill 0)"]
+        
+        LightReset[3-B. Stamp++]
+        
+        Use[4. A* Algorithm Execution]
+    end
+
+    Return[5. Return Context]
+
+    Pool -->|Pop| Rent
+    Rent --> CheckStamp
+    
+    CheckStamp -- Yes (Overflow) --> HeavyReset
+    CheckStamp -- No (Normal) --> LightReset
+    
+    HeavyReset -->|"Cost: O(N)"| LightReset
+    LightReset -->|"Cost: O(1)"| Use
+    
+    Use --> Return
+    Return -->|Push| Pool
+```
+> *PathfindingContext의 Stamp업데이트를 통한 Lazy-Clear 흐름*
+
 ### 4. Async/Await 기반 멀티스레딩
 경로 탐색 요청이 메인 스레드를 차단(Block)하지 않도록 `Task`와 `ConcurrentQueue`를 활용한 비동기 시스템을 구축했습니다.
 
@@ -127,6 +187,37 @@ Task task = Task.Run(() =>
     finally { pool.Return(ctx); } // 반납
 });
 ```
+
+```mermaid
+graph LR
+    subgraph Client [Main Thread]
+        direction LR
+        Agent((Agent))
+        Baker[OctreeBaker]
+        Queue[("Pending Queue")]
+    end
+
+    subgraph Workers [Worker Threads]
+        direction LR
+        Task[Task.Run]
+        Calc[["A* Pathfinding"]]
+    end
+
+    subgraph Resources [Memory Pool]
+        Pool[("Context Pool")]
+    end
+
+    Agent -->|1. Request| Baker
+    Baker -->|2. Enqueue| Queue
+    
+    Queue -->|3. Dequeue & Rent| Pool
+    Pool -.->|Context| Task
+    
+    Task -->|4. Async Calc| Calc
+    Calc -->|5. Result| Baker
+    Calc -.->|Return| Pool
+```
+> *Agent들의 동시다발적인 Path요청과 그에 따른 OctreeBaker의 비동기 요청 처리 흐름*
 
 ### 5. String Pulling & Local Avoidance
 * **Path Optimization:** 격자(Grid) 단위의 이동으로 인한 부자연스러운 "지그재그" 움직임을 `Physics.Raycast`를 이용한 **String Pulling** 기법으로 직선화했습니다. (`PathOptimizer.cs`)
