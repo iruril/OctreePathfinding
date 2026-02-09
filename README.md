@@ -36,7 +36,7 @@
 
 <p align="center">
   <a href="https://www.youtube.com/watch?v=J1d0SdvNlTk">
-    <img src="http://img.youtube.com/vi/J1d0SdvNlTk/0.jpg" width="60%">
+    <img src="http://img.youtube.com/vi/J1d0SdvNlTk/0.jpg" width="80%">
   </a>
   <br>
   <em>Click to Watch Demo Video</em>
