@@ -296,8 +296,8 @@ graph LR
    - 유니티 실행 시 `Awake`에서 자동으로 Octree 데이터가 생성됩니다.
 
 2. **에이전트 (Agent)**
-   - 이동할 오브젝트에 `OctreeAgent` 및 `Rigidbody`를 추가합니다.
-   - 장애물 레이어(`Obstacle Mask`)를 설정한 후 타겟을 지정합니다.
+   - 이동할 오브젝트에 `OctreeAgent` 및 `Rigidbody`를 추가합니다 (useGravity는 false로 설정해주세요).
+   - 장애물 레이어(`Obstacle Mask`)를 설정한 후 이동할 목적지를 지정합니다.
 
 ---
 
