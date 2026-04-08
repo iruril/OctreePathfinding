@@ -65,7 +65,6 @@ namespace Octrees
             Debug.LogFormat("[{0:F3}s] [Octree] Creating Graph with Empty Leaf Node", Time.realtimeSinceStartup);
             
             BuildEdgesWithJob();
-            this.graph.SetMaxInterations();
             Debug.LogFormat("[{0:F3}s] [Octree] Graph Created", Time.realtimeSinceStartup);
             Debug.Log($"[Octree] {this.graph.nodes.Count} nodes created.");
             Debug.Log($"[Octree] {this.graph.edges.Count} edges created.");

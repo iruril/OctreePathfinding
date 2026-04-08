@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -6,27 +7,29 @@ namespace Octrees
 {
     public partial class Graph
     {
-        int maxIterations;
-        public void SetMaxInterations() => maxIterations = nodes.Count * 3;
+        int maxIterations; 
+        public void FinalizeGraph()
+        {
+            maxIterations = nodes.Count * 3;
+            bakedNodes = nodes.Keys.ToArray();
+        }
 
         public bool AStar(Node start, Node end, ref List<Node> path, PathfindingContext ctx)
         {
             path.Clear();
             ctx.BeginNewSearch();
 
-            var open = new SortedSet<Node>(new NodeComparer(ctx));
-
             ctx.Activate(start.id);
             ctx.g[start.id] = 0;
             ctx.h[start.id] = Heuristic(start.octreeNode.bounds.center, end.octreeNode.bounds.center);
-            ctx.f[start.id] = ctx.h[start.id];
-            open.Add(start);
+            ctx.f[start.id] = ctx.h[start.id]; 
+            ctx.openQueue.Enqueue(start, ctx.f[start.id]);
 
             int iterations = 0; 
             Node bestSoFar = start;
             float bestDistance = ctx.h[start.id];
 
-            while (open.Count > 0)
+            while (ctx.openQueue.Count > 0)
             {
                 if (++iterations > maxIterations)
                 {
@@ -34,8 +37,8 @@ namespace Octrees
                     return false;
                 }
 
-                Node current = open.Min;
-                open.Remove(current);
+                Node current = ctx.openQueue.Dequeue();
+                if (ctx.closed[current.id]) continue; //이미 처리된 노드가 나올 수 있으므로 스킵 처리
 
                 if (current == end)
                 {
@@ -68,12 +71,12 @@ namespace Octrees
                         ctx.g[neighbor.id] = tentativeG;
                         ctx.h[neighbor.id] = Heuristic(neighbor.octreeNode.bounds.center, end.octreeNode.bounds.center);
                         ctx.f[neighbor.id] = ctx.g[neighbor.id] + ctx.h[neighbor.id];
-                        open.Add(neighbor);
+                        ctx.openQueue.Enqueue(neighbor, ctx.f[neighbor.id]);
                     }
                 }
             }
 
-            Debug.Log($"[A Star] Fail - no path : {end.octreeNode.bounds.center}");
+            //Debug.Log($"[A Star] Fail - no path : {end.octreeNode.bounds.center}");
             ReconstructPath(bestSoFar, ref path, ctx.from);
             return false;
         }
@@ -94,25 +97,6 @@ namespace Octrees
         {
             nodes.TryGetValue(octreeNode, out Node node);
             return node;
-        }
-
-        public class NodeComparer : IComparer<Node>
-        {
-            private readonly PathfindingContext ctx; 
-            public NodeComparer(PathfindingContext ctx)
-            {
-                this.ctx = ctx;
-            }
-
-            public int Compare(Node x, Node y)
-            {
-                if (x == null || y == null) return 0;
-
-                int result = ctx.f[x.id].CompareTo(ctx.f[y.id]);
-                if (result == 0)
-                    return x.id.CompareTo(y.id);
-                return result;
-            }
         }
     }
 }

@@ -4,45 +4,51 @@ using System.Runtime.CompilerServices;
 
 namespace Octrees
 {
-    public class PathOptimizer
+    public static class PathOptimizer
     {
         private static readonly RaycastHit[] _hits = new RaycastHit[1];
-        public static List<Node> Simplify(List<Node> path, LayerMask obstacleMask)
+
+        public static void Simplify(List<Node> originalPath, List<Node> resultPath, LayerMask obstacleMask)
         {
-            if (path == null || path.Count < 2)
-                return path;
+            resultPath.Clear(); // 에이전트의 기존 경로 비우기
 
-            List<Node> optimized = new(path.Count);
-            int mask = obstacleMask.value;
+            if (originalPath == null || originalPath.Count == 0)
+                return;
 
-            int n = 0;
-            optimized.Add(path[n]);
-
-            while (n < path.Count - 2)
+            // 경로가 짧으면 그대로 복사하고 종료
+            if (originalPath.Count < 2)
             {
-                Vector3 from = path[n].octreeNode.bounds.center;
+                resultPath.AddRange(originalPath);
+                return;
+            }
+
+            int mask = obstacleMask.value;
+            int n = 0;
+            resultPath.Add(originalPath[n]);
+
+            while (n < originalPath.Count - 2)
+            {
+                Vector3 from = originalPath[n].octreeNode.bounds.center;
                 int t;
-                for (t = n + 2; t < path.Count; t++)
+                for (t = n + 2; t < originalPath.Count; t++)
                 {
-                    Vector3 to = path[t].octreeNode.bounds.center;
+                    Vector3 to = originalPath[t].octreeNode.bounds.center;
 
                     if (HasObstacle(from, to, mask))
                     {
                         n = t - 1;
-                        optimized.Add(path[n]);
+                        resultPath.Add(originalPath[n]);
                         break;
                     }
 
-                    if (t == path.Count - 1)
+                    if (t == originalPath.Count - 1)
                     {
-                        optimized.Add(path[t]);
+                        resultPath.Add(originalPath[t]);
                         n = t;
                         break;
                     }
                 }
             }
-
-            return optimized;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

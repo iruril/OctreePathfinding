@@ -46,8 +46,9 @@ namespace Octrees
     public partial class Graph
     {
         public readonly Dictionary<OctreeNode, Node> nodes = new();
-        public readonly HashSet<Edge> edges = new();
-        
+        public readonly HashSet<Edge> edges = new(); 
+        public OctreeNode[] bakedNodes { get; private set; }
+
         public void AddNode(OctreeNode octreeNode)
         {
             if (!nodes.ContainsKey(octreeNode))

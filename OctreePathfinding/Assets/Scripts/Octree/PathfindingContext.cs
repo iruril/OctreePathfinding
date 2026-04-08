@@ -1,5 +1,6 @@
-using System.Runtime.CompilerServices;
+using PriorityQueue;
 using System;
+using System.Runtime.CompilerServices;
 
 namespace Octrees
 {
@@ -9,7 +10,8 @@ namespace Octrees
         public Node[] from;
         public bool[] closed;
         public int[] stamp;
-        private int currentStamp = 1;
+        private int currentStamp = 1; 
+        public PriorityQueue<Node, float> openQueue;
 
         public PathfindingContext(int nodeCount)
         {
@@ -18,7 +20,8 @@ namespace Octrees
             h = new float[nodeCount];
             from = new Node[nodeCount];
             closed = new bool[nodeCount];
-            stamp = new int[nodeCount];
+            stamp = new int[nodeCount]; 
+            openQueue = new PriorityQueue<Node, float>(nodeCount);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -30,6 +33,7 @@ namespace Octrees
                 Array.Fill(stamp, 0);
                 currentStamp = 0;
             }
+            openQueue.Clear();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

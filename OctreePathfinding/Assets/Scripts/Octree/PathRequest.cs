@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace Octrees
 {
-    public class PathRequest
+    public readonly struct PathRequest
     {
-        public OctreeNode startNode;
-        public OctreeNode endNode;
-        public OctreeAgent agent;
+        public readonly OctreeNode startNode;
+        public readonly OctreeNode endNode;
+        public readonly OctreeAgent agent;
 
         public PathRequest(OctreeNode startNode, OctreeNode endNode, OctreeAgent agent)
         {

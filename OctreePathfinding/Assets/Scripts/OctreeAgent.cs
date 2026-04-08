@@ -155,14 +155,17 @@ namespace Octrees
             if (isRequestingPath) return;
             isRequestingPath = true;
 
-            OctreeNode destinationNode;
-            destinationNode = OctreeBaker.Instance.graph.nodes.ElementAt(Random.Range(0, OctreeBaker.Instance.graph.nodes.Count)).Key;
+            OctreeNode[] candidates = OctreeBaker.Instance.graph.bakedNodes;
+            OctreeNode destinationNode = candidates[Random.Range(0, candidates.Length)];
+
             OctreeBaker.Instance.RequestPath(currentNode, destinationNode, this);
         }
 
         public void OnPathReady(List<Node> newPath, bool result)
         {
-            path = PathOptimizer.Simplify(newPath, OctreeBaker.Instance.obstacleMaskLayer);
+            // 자신의 path 리스트 참조를 넘겨 최적화된 경로로 채움
+            PathOptimizer.Simplify(newPath, this.path, OctreeBaker.Instance.obstacleMaskLayer);
+
             IsCompletePath = result;
             currentWaypoint = 0;
             isRequestingPath = false;
@@ -178,7 +181,6 @@ namespace Octrees
         SensorHit[] sensorBuffer = new SensorHit[Directions.Length];
         SensorHit[] ScanEnvironment(float distance, LayerMask mask)
         {
-            SensorHit[] result = new SensorHit[Directions.Length];
             Vector3 origin = rb.position;
 
             for (int i = 0; i < Directions.Length; i++)

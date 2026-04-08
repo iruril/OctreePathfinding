@@ -22,7 +22,8 @@ namespace Octrees
         //멀티스레드 환경에서 동시다발적인 Enqueue(), Dequeue()에 대응하기 위함 
         private readonly ConcurrentQueue<(OctreeAgent agent, List<Node> path, bool result)> completeAgents = new();
         private readonly Queue<PathRequest> pendingRequests = new();
-        private readonly List<Task> runningTasks = new();
+        private readonly List<Task> runningTasks = new(); 
+        private readonly ConcurrentStack<List<Node>> listPool = new(); // GC 방지 위해 리스트 재활용
 
         private const int maxConcurrentTasks = 6;
 
@@ -39,9 +40,18 @@ namespace Octrees
 
             MeshFilter[] LevelMeshs = levelParent.GetComponentsInChildren<MeshFilter>(includeInactive: false);
 
-            ot = new Octree(LevelMeshs, minNodeSize, graph);
+            ot = new Octree(LevelMeshs, minNodeSize, graph); 
+            graph.FinalizeGraph();
             pool.Init(ot.graph.nodes.Count, maxConcurrentTasks);
+
+            // 리스트 풀 사전 할당
+            int initialListCount = maxConcurrentTasks * 2;
+            for (int i = 0; i < initialListCount; i++)
+            {
+                listPool.Push(new List<Node>(100)); // 100은 경로의 예상 평균 길이, 추후 임의로 세팅 가능
+            }
         }
+
         private void OnGUI()
         {
             GUIStyle style = new GUIStyle(GUI.skin.label);
@@ -68,7 +78,12 @@ namespace Octrees
         {
             if (completeAgents.Count > 0)
             {
-                if (completeAgents.TryDequeue(out var result)) result.agent.OnPathReady(result.path, result.result);
+                if (completeAgents.TryDequeue(out var result))
+                {
+                    result.agent.OnPathReady(result.path, result.result);
+                    result.path.Clear();// 에이전트가 경로를 받았으니, 풀에 리스트 반환
+                    listPool.Push(result.path);
+                }
             }
 
             runningTasks.RemoveAll(t => t.IsCompleted);
@@ -86,7 +101,11 @@ namespace Octrees
 
                 Task task = Task.Run(() =>
                 {
-                    List<Node> path = new();
+                    if (!listPool.TryPop(out List<Node> path))
+                    {
+                        path = new List<Node>(100); // 100은 경로의 예상 평균 길이, 추후 임의로 세팅 가능
+                    }
+
                     PathfindingContext ctx = pool.Rent();
                     try
                     {
